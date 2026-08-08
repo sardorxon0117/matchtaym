@@ -177,11 +177,14 @@ model Transfer {
 }
 
 // Single-row site-wide ad banner, managed from the admin panel.
+// Mobile and desktop use separate images since their slots have very
+// different aspect ratios (a thin strip vs. a tall sidebar panel).
 model Banner {
-  id        String   @id @default(cuid())
-  imageUrl  String
-  linkUrl   String
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(cuid())
+  mobileImageUrl  String
+  desktopImageUrl String
+  linkUrl         String
+  updatedAt       DateTime @updatedAt
 
   @@map("banner")
 }

@@ -8,10 +8,14 @@ export default async function AdminBannerPage() {
     <div>
       <h1 className="mb-2 font-heading text-2xl font-bold text-ink">Reklama banneri</h1>
       <p className="mb-6 text-sm text-ink-soft">
-        Bitta banner butun saytda ko&apos;rinadi: telefonlarda header ostida, kompyuter/planshetlarda o&apos;ng
-        tomonda. Yangi rasm yuklasangiz, eskisi almashtiriladi.
+        Mobil va kompyuter/planshet uchun alohida rasm yuklaysiz — har biri o&apos;z joyiga moslashtirilgan
+        o&apos;lchamda ko&apos;rinadi. Yangi rasm yuklasangiz, eskisi almashtiriladi.
       </p>
-      <BannerForm initialImageUrl={banner?.imageUrl ?? ""} initialLinkUrl={banner?.linkUrl ?? ""} />
+      <BannerForm
+        initialMobileImageUrl={banner?.mobileImageUrl ?? ""}
+        initialDesktopImageUrl={banner?.desktopImageUrl ?? ""}
+        initialLinkUrl={banner?.linkUrl ?? ""}
+      />
     </div>
   );
 }

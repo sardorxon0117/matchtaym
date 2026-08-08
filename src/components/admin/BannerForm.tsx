@@ -5,21 +5,30 @@ import ImageUploader from "./ImageUploader";
 import { updateBanner } from "@/actions/banner";
 
 export default function BannerForm({
-  initialImageUrl,
+  initialMobileImageUrl,
+  initialDesktopImageUrl,
   initialLinkUrl,
 }: {
-  initialImageUrl: string;
+  initialMobileImageUrl: string;
+  initialDesktopImageUrl: string;
   initialLinkUrl: string;
 }) {
-  const [imageUrl, setImageUrl] = useState(initialImageUrl);
+  const [mobileImageUrl, setMobileImageUrl] = useState(initialMobileImageUrl);
+  const [desktopImageUrl, setDesktopImageUrl] = useState(initialDesktopImageUrl);
 
   return (
     <form action={updateBanner} className="max-w-md space-y-5">
       <div className="rounded-card border border-ink/10 bg-white p-5">
-        <ImageUploader name="imageUrl" value={imageUrl} onChange={setImageUrl} label="Banner rasmi" />
+        <ImageUploader name="mobileImageUrl" value={mobileImageUrl} onChange={setMobileImageUrl} label="Mobil banner (ingichka, keng chiziq)" />
         <p className="mt-2 text-xs text-ink-soft/70">
-          Rasm avtomatik ravishda banner o&apos;lchamiga moslashadi (cover). Tavsiya: kvadratga yaqin yoki vertikal
-          rasm ishlating.
+          Tavsiya: keng va past rasm (masalan 1200×300). Telefonlarda header ostida ko&apos;rinadi.
+        </p>
+      </div>
+
+      <div className="rounded-card border border-ink/10 bg-white p-5">
+        <ImageUploader name="desktopImageUrl" value={desktopImageUrl} onChange={setDesktopImageUrl} label="Kompyuter/planshet banner (tik panel)" />
+        <p className="mt-2 text-xs text-ink-soft/70">
+          Tavsiya: tik (vertikal) rasm (masalan 600×1200). Kompyuter va planshetlarda o&apos;ng tomonda ko&apos;rinadi.
         </p>
       </div>
 

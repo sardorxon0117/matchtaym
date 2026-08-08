@@ -6,7 +6,8 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/require-admin";
 
 const schema = z.object({
-  imageUrl: z.string().min(1, "Rasm yuklang"),
+  mobileImageUrl: z.string().min(1, "Mobil uchun rasm yuklang"),
+  desktopImageUrl: z.string().min(1, "Kompyuter uchun rasm yuklang"),
   linkUrl: z.string().url("Havola noto'g'ri (https:// bilan boshlansin)"),
 });
 
