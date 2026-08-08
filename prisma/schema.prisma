@@ -1,0 +1,105 @@
+// MatchTaym — Prisma schema
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum TransferStatus {
+  RUMOR
+  CONFIRMED
+  OFFICIAL
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  role         Role      @default(EDITOR)
+  createdAt    DateTime  @default(now())
+  articles     Article[]
+
+  @@map("users")
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String
+  slug     String    @unique
+  articles Article[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id       String    @id @default(cuid())
+  name     String
+  slug     String    @unique
+  articles Article[] @relation("ArticleToTag")
+
+  @@map("tags")
+}
+
+model Article {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  excerpt     String?
+  content     String
+  coverImage  String?
+  status      ArticleStatus @default(DRAFT)
+  views       Int           @default(0)
+  readTimeMin Int           @default(3)
+  metaTitle   String?
+  metaDesc    String?
+  publishedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+
+  tags      Tag[]      @relation("ArticleToTag")
+  transfers Transfer[]
+
+  @@index([status, publishedAt])
+  @@map("articles")
+}
+
+model Transfer {
+  id          String         @id @default(cuid())
+  playerName  String
+  playerImage String?
+  fromClub    String
+  toClub      String
+  fee         String?
+  status      TransferStatus @default(RUMOR)
+  date        DateTime       @default(now())
+  league      String?
+  createdAt   DateTime       @default(now())
+
+  relatedArticle   Article? @relation(fields: [relatedArticleId], references: [id])
+  relatedArticleId String?
+
+  @@index([status, date])
+  @@map("transfers")
+}
