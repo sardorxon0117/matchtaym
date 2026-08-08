@@ -8,6 +8,10 @@ export default {
     signIn: "/kirish",
   },
   session: { strategy: "jwt" },
+  // We control the deployment (Vercel terminates TLS and forwards the real
+  // Host header), so it's safe to trust it. Without this, NextAuth rejects
+  // requests on the custom domain in production with "UntrustedHost".
+  trustHost: true,
   providers: [],
   callbacks: {
     authorized({ auth, request }) {
