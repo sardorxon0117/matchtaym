@@ -14,12 +14,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticEntries: MetadataRoute.Sitemap = [
     { url: siteUrl, changeFrequency: "hourly", priority: 1 },
-    { url: `${siteUrl}/transferlar`, changeFrequency: "hourly", priority: 0.8 },
     { url: `${siteUrl}/qidiruv`, changeFrequency: "weekly", priority: 0.3 },
     ...CATEGORY_SEED.map((c) => ({
       url: `${siteUrl}/kategoriya/${c.slug}`,
       changeFrequency: "hourly" as const,
-      priority: 0.7,
+      priority: c.slug === "transferlar" ? 0.8 : 0.7,
     })),
   ];
 

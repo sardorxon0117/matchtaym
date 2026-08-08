@@ -17,30 +17,21 @@ const articleCard = {
   author: { select: { name: true } },
 } satisfies Prisma.ArticleSelect;
 
-export async function getHeroAndFeed(page = 1) {
-  const publishedWhere: Prisma.ArticleWhereInput = { status: "PUBLISHED" };
+export async function getFeed(page = 1) {
+  const where: Prisma.ArticleWhereInput = { status: "PUBLISHED" };
 
-  const hero = page === 1
-    ? await prisma.article.findFirst({
-        where: publishedWhere,
-        orderBy: { publishedAt: "desc" },
-        select: articleCard,
-      })
-    : null;
-
-  const excludeId = hero?.id;
   const [items, total] = await Promise.all([
     prisma.article.findMany({
-      where: excludeId ? { ...publishedWhere, id: { not: excludeId } } : publishedWhere,
+      where,
       orderBy: { publishedAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
       select: articleCard,
     }),
-    prisma.article.count({ where: publishedWhere }),
+    prisma.article.count({ where }),
   ]);
 
-  return { hero, items, total, pageSize: PAGE_SIZE };
+  return { items, total, pageSize: PAGE_SIZE };
 }
 
 export async function getArticlesByCategory(slug: string, page = 1) {

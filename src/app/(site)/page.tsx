@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { getHeroAndFeed } from "@/lib/queries";
-import HeroCard from "@/components/HeroCard";
+import { getFeed } from "@/lib/queries";
 import ArticleCard from "@/components/ArticleCard";
 import Pagination from "@/components/Pagination";
 
@@ -17,16 +16,10 @@ export default async function Home({
 }) {
   const { page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
-  const { hero, items, total, pageSize } = await getHeroAndFeed(page);
+  const { items, total, pageSize } = await getFeed(page);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      {hero && (
-        <div className="mb-10">
-          <HeroCard article={hero} />
-        </div>
-      )}
-
       {items.length > 0 ? (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((article) => (
@@ -34,11 +27,9 @@ export default async function Home({
           ))}
         </div>
       ) : (
-        !hero && (
-          <p className="py-16 text-center text-ink-soft">
-            Hozircha maqolalar yo&apos;q. Tez orada yangiliklar bilan qaytamiz!
-          </p>
-        )
+        <p className="py-16 text-center text-ink-soft">
+          Hozircha maqolalar yo&apos;q. Tez orada yangiliklar bilan qaytamiz!
+        </p>
       )}
 
       <Pagination page={page} total={total} pageSize={pageSize} basePath="/" />

@@ -23,12 +23,7 @@ export default function Footer() {
             Bo&apos;limlar
           </h3>
           <ul className="space-y-2 text-sm">
-            <li>
-              <Link href="/transferlar" className="text-cream/80 hover:text-accent">
-                Transferlar
-              </Link>
-            </li>
-            {CATEGORY_SEED.slice(1).map((c) => (
+            {CATEGORY_SEED.map((c) => (
               <li key={c.slug}>
                 <Link href={`/kategoriya/${c.slug}`} className="text-cream/80 hover:text-accent">
                   {c.name}

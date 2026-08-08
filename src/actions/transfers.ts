@@ -36,7 +36,7 @@ export async function createTransfer(formData: FormData) {
     },
   });
 
-  revalidatePath("/transferlar");
+  revalidatePath("/kategoriya/transferlar");
   revalidatePath("/admin/transferlar");
   redirect("/admin/transferlar");
 }
@@ -60,7 +60,7 @@ export async function updateTransfer(id: string, formData: FormData) {
     },
   });
 
-  revalidatePath("/transferlar");
+  revalidatePath("/kategoriya/transferlar");
   revalidatePath("/admin/transferlar");
   redirect("/admin/transferlar");
 }
@@ -68,6 +68,6 @@ export async function updateTransfer(id: string, formData: FormData) {
 export async function deleteTransfer(id: string) {
   await requireAdmin();
   await prisma.transfer.delete({ where: { id } });
-  revalidatePath("/transferlar");
+  revalidatePath("/kategoriya/transferlar");
   revalidatePath("/admin/transferlar");
 }

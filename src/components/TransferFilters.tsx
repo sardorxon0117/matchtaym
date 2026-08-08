@@ -24,7 +24,7 @@ export default function TransferFilters({
     if (nextLeague) params.set("league", nextLeague);
     const qs = params.toString();
     startTransition(() => {
-      router.replace(qs ? `/transferlar?${qs}` : "/transferlar");
+      router.replace(qs ? `/kategoriya/transferlar?${qs}` : "/kategoriya/transferlar");
     });
   }
 
