@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { searchArticles } from "@/lib/queries";
 import ArticleCard from "@/components/ArticleCard";
 import Pagination from "@/components/Pagination";
+import SearchBox from "@/components/SearchBox";
 
 export const metadata: Metadata = { title: "Qidiruv" };
 
@@ -20,19 +21,9 @@ export default async function SearchPage({
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       <h1 className="mb-6 font-heading text-2xl font-bold text-ink sm:text-3xl">Qidiruv</h1>
 
-      <form action="/qidiruv" className="mb-8 flex gap-2">
-        <input
-          type="search"
-          name="q"
-          defaultValue={q}
-          placeholder="Maqola, o'yinchi, klub nomi bo'yicha qidiring…"
-          className="input"
-          autoFocus
-        />
-        <button type="submit" className="whitespace-nowrap rounded-pill bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark">
-          Qidirish
-        </button>
-      </form>
+      <div className="mb-8">
+        <SearchBox initialQuery={q} />
+      </div>
 
       {q ? (
         <>

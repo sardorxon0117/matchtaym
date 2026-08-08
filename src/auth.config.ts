@@ -1,26 +1,31 @@
 import type { NextAuthConfig } from "next-auth";
 
-// Edge-safe config (no Prisma / bcrypt here) — used by middleware.
+const STAFF_ROLES = new Set(["ADMIN", "EDITOR"]);
+
+// Edge-safe config (no Prisma / bcrypt here) — used by the proxy/middleware.
 export default {
   pages: {
-    signIn: "/admin/login",
+    signIn: "/kirish",
   },
   session: { strategy: "jwt" },
   providers: [],
   callbacks: {
     authorized({ auth, request }) {
-      const isLoggedIn = !!auth?.user;
-      const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
-      const isLoginPage = request.nextUrl.pathname === "/admin/login";
+      const role = (auth?.user as { role?: string } | undefined)?.role;
+      const isStaff = !!role && STAFF_ROLES.has(role);
+      const { pathname } = request.nextUrl;
+      const isAdminLoginPage = pathname === "/admin/login";
+      const isAdminRoute = pathname.startsWith("/admin");
 
-      if (isLoginPage) {
-        if (isLoggedIn) {
-          return Response.redirect(new URL("/admin", request.nextUrl));
-        }
+      if (isAdminLoginPage) {
+        if (isStaff) return Response.redirect(new URL("/admin", request.nextUrl));
         return true;
       }
 
-      if (isAdminRoute) return isLoggedIn;
+      if (isAdminRoute) {
+        if (isStaff) return true;
+        return Response.redirect(new URL("/admin/login", request.nextUrl));
+      }
 
       return true;
     },

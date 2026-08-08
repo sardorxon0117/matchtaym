@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getArticlesByCategory } from "@/lib/queries";
 import ArticleCard from "@/components/ArticleCard";
-import CategoryPills from "@/components/CategoryPills";
 import Pagination from "@/components/Pagination";
 
 export async function generateMetadata({
@@ -31,10 +30,6 @@ export default async function CategoryPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <div className="mb-6">
-        <CategoryPills activeSlug={slug} />
-      </div>
-
       <h1 className="mb-6 font-heading text-2xl font-bold text-ink sm:text-3xl">{category.name}</h1>
 
       {items.length > 0 ? (

@@ -7,12 +7,17 @@ const NAV = [
   { href: "/admin/maqolalar", label: "Maqolalar", icon: "📰" },
   { href: "/admin/kategoriyalar", label: "Kategoriyalar", icon: "🏷️" },
   { href: "/admin/transferlar", label: "Transferlar", icon: "🔁" },
+  { href: "/admin/izohlar", label: "Izohlar", icon: "💬" },
+  { href: "/admin/banner", label: "Reklama banneri", icon: "📣" },
 ];
+
+const STAFF_ROLES = new Set(["ADMIN", "EDITOR"]);
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
+  const isStaff = !!session?.user && STAFF_ROLES.has((session.user as { role?: string }).role ?? "");
 
-  if (!session?.user) {
+  if (!isStaff) {
     return <div className="min-h-screen bg-ink">{children}</div>;
   }
 
@@ -38,8 +43,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           ))}
         </nav>
         <div className="border-t border-ink/10 p-3">
-          <p className="truncate px-3 py-1 text-xs text-ink-soft/70">{session.user.email}</p>
-          <form action={logoutAction}>
+          <p className="truncate px-3 py-1 text-xs text-ink-soft/70">{session!.user.email}</p>
+          <form action={logoutAction.bind(null, "/admin/login")}>
             <button className="w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium text-ink-soft hover:bg-cream hover:text-primary">
               🚪 Chiqish
             </button>
@@ -52,7 +57,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <span className="font-heading text-lg font-bold text-ink">
             Match<span className="text-primary">Taym</span>
           </span>
-          <form action={logoutAction}>
+          <form action={logoutAction.bind(null, "/admin/login")}>
             <button className="text-sm font-medium text-ink-soft">Chiqish</button>
           </form>
         </header>

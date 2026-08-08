@@ -10,13 +10,14 @@ export default async function AdminDashboard() {
     { label: "Qoralamalar", value: stats.draftCount },
     { label: "Jami ko'rishlar", value: stats.totalViews },
     { label: "Transferlar", value: stats.transferCount },
+    { label: "Izohlar", value: stats.commentCount },
   ];
 
   return (
     <div>
       <h1 className="mb-6 font-heading text-2xl font-bold text-ink">Boshqaruv paneli</h1>
 
-      <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {cards.map((c) => (
           <div key={c.label} className="rounded-card border border-ink/10 bg-white p-4">
             <p className="text-2xl font-bold text-ink">{c.value}</p>

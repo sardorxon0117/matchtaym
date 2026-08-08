@@ -193,12 +193,44 @@ export async function getAllTransfersForAdmin() {
   });
 }
 
+export async function getBanner() {
+  return prisma.banner.findFirst({ orderBy: { updatedAt: "desc" } });
+}
+
+export async function getCommentsForArticle(articleId: string) {
+  const comments = await prisma.comment.findMany({
+    where: { articleId },
+    orderBy: { createdAt: "asc" },
+    include: {
+      author: { select: { id: true, name: true, image: true, role: true } },
+    },
+  });
+
+  type CommentWithAuthor = (typeof comments)[number];
+  type CommentNode = CommentWithAuthor & { replies: CommentNode[] };
+
+  const byId = new Map<string, CommentNode>();
+  for (const c of comments) byId.set(c.id, { ...c, replies: [] });
+
+  const roots: CommentNode[] = [];
+  for (const c of comments) {
+    const node = byId.get(c.id)!;
+    if (c.parentId && byId.has(c.parentId)) {
+      byId.get(c.parentId)!.replies.push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+  return roots;
+}
+
 export async function getDashboardStats() {
-  const [articleCount, publishedCount, transferCount, totalViews] = await Promise.all([
+  const [articleCount, publishedCount, transferCount, totalViews, commentCount] = await Promise.all([
     prisma.article.count(),
     prisma.article.count({ where: { status: "PUBLISHED" } }),
     prisma.transfer.count(),
     prisma.article.aggregate({ _sum: { views: true } }),
+    prisma.comment.count(),
   ]);
   return {
     articleCount,
@@ -206,5 +238,17 @@ export async function getDashboardStats() {
     draftCount: articleCount - publishedCount,
     transferCount,
     totalViews: totalViews._sum.views ?? 0,
+    commentCount,
   };
+}
+
+export async function getAllCommentsForAdmin() {
+  return prisma.comment.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 300,
+    include: {
+      author: { select: { name: true, role: true } },
+      article: { select: { title: true, slug: true } },
+    },
+  });
 }

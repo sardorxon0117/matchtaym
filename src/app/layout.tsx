@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Fredoka, Inter } from "next/font/google";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import "./globals.css";
 
 const fredoka = Fredoka({
@@ -45,11 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="uz"
       className={`${fredoka.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-cream text-ink">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-      </body>
+      <body className="min-h-full flex flex-col bg-cream text-ink">{children}</body>
     </html>
   );
 }

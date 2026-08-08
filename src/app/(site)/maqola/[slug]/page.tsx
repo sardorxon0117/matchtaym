@@ -7,6 +7,7 @@ import { renderMarkdown } from "@/lib/markdown";
 import { formatDateUz } from "@/lib/utils";
 import ArticleCard from "@/components/ArticleCard";
 import ShareButtons from "@/components/ShareButtons";
+import CommentSection from "@/components/CommentSection";
 
 export const dynamic = "force-dynamic";
 
@@ -117,6 +118,8 @@ export default async function ArticlePage({
           </div>
         </div>
       )}
+
+      <CommentSection articleId={article.id} />
     </article>
   );
 }

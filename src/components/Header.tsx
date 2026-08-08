@@ -2,20 +2,23 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Logo from "./Logo";
+import UserMenu, { type HeaderUser } from "./UserMenu";
 import { CATEGORY_SEED } from "@/lib/utils";
 
 const NAV_LINKS = [
   { href: "/", label: "Bosh sahifa" },
   { href: "/transferlar", label: "Transferlar" },
-  ...CATEGORY_SEED.slice(1).map((c) => ({
+  ...CATEGORY_SEED.map((c) => ({
     href: `/kategoriya/${c.slug}`,
     label: c.name,
   })),
 ];
 
-export default function Header() {
+export default function Header({ user }: { user: HeaderUser | null }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-40 border-b border-black/5 bg-cream/95 backdrop-blur">
@@ -27,7 +30,9 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-ink-soft transition-colors hover:text-primary"
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                pathname === link.href ? "text-primary" : "text-ink-soft"
+              }`}
             >
               {link.label}
             </Link>
@@ -42,16 +47,26 @@ export default function Header() {
           >
             <SearchIcon />
           </Link>
+          <UserMenu user={user} />
         </div>
 
-        <button
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-ink/10 md:hidden"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Menyu"
-          aria-expanded={open}
-        >
-          {open ? <CloseIcon /> : <MenuIcon />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <Link
+            href="/qidiruv"
+            aria-label="Qidiruv"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-ink/10 text-ink-soft"
+          >
+            <SearchIcon />
+          </Link>
+          <button
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-ink/10"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Menyu"
+            aria-expanded={open}
+          >
+            {open ? <CloseIcon /> : <MenuIcon />}
+          </button>
+        </div>
       </div>
 
       {open && (
@@ -62,18 +77,16 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-2 py-2.5 text-sm font-medium text-ink-soft hover:bg-white hover:text-primary"
+                className={`rounded-lg px-2 py-2.5 text-sm font-medium hover:bg-white hover:text-primary ${
+                  pathname === link.href ? "text-primary" : "text-ink-soft"
+                }`}
               >
                 {link.label}
               </Link>
             ))}
-            <Link
-              href="/qidiruv"
-              onClick={() => setOpen(false)}
-              className="rounded-lg px-2 py-2.5 text-sm font-medium text-ink-soft hover:bg-white hover:text-primary"
-            >
-              Qidiruv
-            </Link>
+            <div className="mt-2 border-t border-ink/10 pt-2">
+              <UserMenu user={user} onNavigate={() => setOpen(false)} />
+            </div>
           </nav>
         </div>
       )}

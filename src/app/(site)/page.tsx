@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { getHeroAndFeed } from "@/lib/queries";
 import HeroCard from "@/components/HeroCard";
 import ArticleCard from "@/components/ArticleCard";
-import CategoryPills from "@/components/CategoryPills";
 import Pagination from "@/components/Pagination";
 
 export const metadata: Metadata = {
@@ -22,10 +21,6 @@ export default async function Home({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <div className="mb-6">
-        <CategoryPills />
-      </div>
-
       {hero && (
         <div className="mb-10">
           <HeroCard article={hero} />
