@@ -1,16 +1,18 @@
+import { Suspense } from "react";
 import { auth } from "@/auth";
 import { getActiveBanners } from "@/lib/queries";
-import { getFeedMatches } from "@/lib/matches";
-import { pickClosestMatches } from "@/lib/match-format";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileAdBanner from "@/components/MobileAdBanner";
-import HeroPromoBox from "@/components/HeroPromoBox";
+import PromoBoxServer from "@/components/PromoBoxServer";
+import PromoBoxSkeleton from "@/components/PromoBoxSkeleton";
 import type { HeaderUser } from "@/components/UserMenu";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [session, banners, matches] = await Promise.all([auth(), getActiveBanners(), getFeedMatches()]);
-  const heroMatches = pickClosestMatches(matches, 3);
+  // Only fast, first-party data here (auth + our own DB) — the slow
+  // third-party matches feed lives inside PromoBoxServer's own Suspense
+  // boundary below, so it can never block the rest of the page.
+  const [session, banners] = await Promise.all([auth(), getActiveBanners()]);
 
   const user: HeaderUser | null = session?.user
     ? {
@@ -27,10 +29,12 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <Header user={user} />
       <MobileAdBanner banners={banners} />
 
-      <div className="mx-auto flex w-full max-w-[88rem] items-start gap-6 px-0 md:px-6">
+      <div className="mx-auto flex w-full max-w-[90rem] items-start gap-6 px-0 md:px-6">
         <div className="min-w-0 flex-1">{children}</div>
-        <aside className="sticky top-20 hidden w-[300px] shrink-0 py-8 md:block">
-          <HeroPromoBox matches={heroMatches} banners={banners} />
+        <aside className="sticky top-20 hidden w-[340px] shrink-0 py-8 md:block">
+          <Suspense fallback={<PromoBoxSkeleton />}>
+            <PromoBoxServer banners={banners} />
+          </Suspense>
         </aside>
       </div>
 

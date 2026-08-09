@@ -12,7 +12,8 @@ type FeedResponse = { result?: FeedMatch[] };
 export async function getFeedMatches(): Promise<FeedMatch[]> {
   let data: FeedResponse;
   try {
-    const res = await fetch(FEED_URL, { next: { revalidate: 300 } });
+    // This is a third-party feed we don't control — never let it hang the page.
+    const res = await fetch(FEED_URL, { next: { revalidate: 300 }, signal: AbortSignal.timeout(4000) });
     if (!res.ok) return [];
     data = await res.json();
   } catch (err) {

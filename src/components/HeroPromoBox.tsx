@@ -33,16 +33,16 @@ export default function HeroPromoBox({ matches, banners }: { matches: FeedMatch[
       className={`overflow-hidden rounded-card border border-ink/10 bg-white ${activeBanner ? "cursor-pointer" : ""}`}
     >
       {activeBanner && (
-        <div key={activeBanner.id} className="ad-fade relative h-40 w-full">
-          <Image src={activeBanner.desktopImageUrl} alt="Reklama" fill className="object-cover" sizes="300px" />
+        <div key={activeBanner.id} className="ad-fade relative h-56 w-full">
+          <Image src={activeBanner.desktopImageUrl} alt="Reklama" fill className="object-cover" sizes="340px" />
           <span className="absolute bottom-2 right-2 rounded bg-ink/60 px-1.5 py-0.5 text-[10px] text-white">
             Reklama
           </span>
         </div>
       )}
 
-      <div className={`p-4 ${activeBanner ? "border-t border-ink/5" : ""}`}>
-        <h3 className="mb-1 font-heading text-base font-bold text-ink">O&apos;yinlar</h3>
+      <div className={`p-5 ${activeBanner ? "border-t border-ink/5" : ""}`}>
+        <h3 className="mb-2 font-heading text-lg font-bold text-ink">O&apos;yinlar</h3>
 
         {matches.length > 0 ? (
           <div className="divide-y divide-ink/5">
@@ -60,7 +60,7 @@ export default function HeroPromoBox({ matches, banners }: { matches: FeedMatch[
             e.stopPropagation();
             router.push("/oyinlar");
           }}
-          className="mt-2 block w-full rounded-pill bg-cream py-2 text-center text-sm font-semibold text-primary hover:bg-primary hover:text-white"
+          className="mt-3 block w-full rounded-pill bg-cream py-2.5 text-center text-sm font-semibold text-primary hover:bg-primary hover:text-white"
         >
           Boshqa o&apos;yinlar →
         </button>
