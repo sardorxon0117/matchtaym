@@ -254,6 +254,14 @@ export async function getDashboardStats() {
   };
 }
 
+export async function getDonationInquiries() {
+  return prisma.donationInquiry.findMany({ orderBy: { createdAt: "desc" } });
+}
+
+export async function getFeedbackList() {
+  return prisma.feedback.findMany({ orderBy: { createdAt: "desc" } });
+}
+
 export async function getAllCommentsForAdmin(filter: "all" | "answered" | "pending" = "all") {
   const topLevel = await prisma.comment.findMany({
     where: { parentId: null },

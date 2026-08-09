@@ -27,6 +27,11 @@ enum TransferStatus {
   OFFICIAL
 }
 
+enum FeedbackType {
+  SUGGESTION
+  COMPLAINT
+}
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -149,7 +154,7 @@ model Comment {
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId String
 
-  parent   Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   parentId String?
   replies  Comment[] @relation("CommentReplies")
 
@@ -198,4 +203,32 @@ model Banner {
 
   @@index([startAt, endAt])
   @@map("banner")
+}
+
+// Someone on the /donate page who wants to be notified once real payment
+// (Click) support goes live — a lead, not an actual payment (there is no
+// payment processor wired up yet).
+model DonationInquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("donation_inquiries")
+}
+
+// "Taklif va shikoyatlar" — suggestions/complaints submitted from the
+// /donate page's feedback form.
+model Feedback {
+  id        String       @id @default(cuid())
+  type      FeedbackType @default(SUGGESTION)
+  name      String
+  email     String
+  message   String
+  createdAt DateTime     @default(now())
+
+  @@index([createdAt])
+  @@map("feedback")
 }

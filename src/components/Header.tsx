@@ -14,6 +14,7 @@ const NAV_LINKS = [
     href: `/kategoriya/${c.slug}`,
     label: c.name,
   })),
+  { href: "/donate", label: "Donate" },
 ];
 
 export default function Header({ user }: { user: HeaderUser | null }) {

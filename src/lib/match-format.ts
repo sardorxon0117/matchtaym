@@ -83,3 +83,20 @@ export function pickClosestFixtures(fixtures: Fixture[], count: number, nowSec: 
     .sort((a, b) => Math.abs(a.timestamp - nowSec) - Math.abs(b.timestamp - nowSec))
     .slice(0, count);
 }
+
+/**
+ * Picks one fixture per given league (the earliest-kickoff match of that
+ * league in the supplied list), in the order the leagues are given — used
+ * for the compact promo box, which wants variety (one match each from a
+ * fixed set of leagues) rather than just "whatever's closest to now".
+ * Leagues with no current fixture are simply skipped.
+ */
+export function pickOnePerLeague(fixtures: Fixture[], leagueIds: number[]): Fixture[] {
+  const picks: Fixture[] = [];
+  for (const id of leagueIds) {
+    const candidates = fixtures.filter((f) => f.leagueId === id);
+    if (candidates.length === 0) continue;
+    picks.push(candidates.reduce((a, b) => (a.timestamp <= b.timestamp ? a : b)));
+  }
+  return picks.sort((a, b) => a.timestamp - b.timestamp);
+}

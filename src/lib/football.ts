@@ -8,6 +8,11 @@ const API_BASE = "https://api.football-data.org/v4";
 // free football-data.org plan — checked directly against the account.)
 const COMPETITIONS = ["PL", "PD", "SA", "BL1", "FL1", "CL"] as const;
 
+// football-data.org's numeric competition IDs for Premier League, La Liga
+// and Bundesliga — used to pick "one match per league" for the compact
+// promo box (as opposed to the full /oyinlar list, which shows everything).
+export const PROMO_LEAGUE_IDS = [2021, 2014, 2002];
+
 type CompetitionInfo = {
   currentSeason: { endDate: string; currentMatchday: number | null } | null;
 };

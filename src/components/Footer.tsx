@@ -30,6 +30,11 @@ export default function Footer() {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link href="/donate" className="text-cream/80 hover:text-accent">
+                Donate
+              </Link>
+            </li>
           </ul>
         </div>
 

@@ -91,6 +91,5 @@ export function dateToTashkentInputValue(date: Date | string): string {
 export const CATEGORY_SEED = [
   { name: "Transferlar", slug: "transferlar" },
   { name: "Milliy terma", slug: "milliy-terma" },
-  { name: "Liga yangiliklari", slug: "liga-yangiliklari" },
   { name: "Tahlil", slug: "tahlil" },
 ];

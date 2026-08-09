@@ -10,23 +10,9 @@ function escapeHtml(text: string): string {
     .replace(/>/g, "&gt;");
 }
 
-/** Fire-and-forget — a Telegram hiccup should never break commenting. */
-export async function notifyNewComment(params: {
-  authorName: string;
-  content: string;
-  articleTitle: string;
-  articleUrl: string;
-  isReply: boolean;
-}) {
+/** Fire-and-forget — a Telegram hiccup should never break the caller's flow. */
+async function sendTelegramMessage(text: string) {
   if (!BOT_TOKEN || !CHAT_ID) return;
-
-  const kind = params.isReply ? "Javob" : "Yangi izoh";
-  const text =
-    `💬 <b>${kind}</b>\n` +
-    `<b>${escapeHtml(params.authorName)}</b>: ${escapeHtml(params.content)}\n\n` +
-    `📰 ${escapeHtml(params.articleTitle)}\n` +
-    `${params.articleUrl}`;
-
   try {
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: "POST",
@@ -41,4 +27,42 @@ export async function notifyNewComment(params: {
   } catch (err) {
     console.error("Telegram notify failed:", err);
   }
+}
+
+export async function notifyNewComment(params: {
+  authorName: string;
+  content: string;
+  articleTitle: string;
+  articleUrl: string;
+  isReply: boolean;
+}) {
+  const kind = params.isReply ? "Javob" : "Yangi izoh";
+  await sendTelegramMessage(
+    `💬 <b>${kind}</b>\n` +
+      `<b>${escapeHtml(params.authorName)}</b>: ${escapeHtml(params.content)}\n\n` +
+      `📰 ${escapeHtml(params.articleTitle)}\n` +
+      `${params.articleUrl}`
+  );
+}
+
+export async function notifyNewDonationInquiry(params: { name: string; email: string; message: string | null }) {
+  await sendTelegramMessage(
+    `💚 <b>Yangi yordam so'rovi (Donate)</b>\n` +
+      `<b>${escapeHtml(params.name)}</b> — ${escapeHtml(params.email)}` +
+      (params.message ? `\n${escapeHtml(params.message)}` : "")
+  );
+}
+
+export async function notifyNewFeedback(params: {
+  name: string;
+  email: string;
+  message: string;
+  type: "SUGGESTION" | "COMPLAINT";
+}) {
+  const kind = params.type === "COMPLAINT" ? "Shikoyat" : "Taklif";
+  await sendTelegramMessage(
+    `📩 <b>Yangi ${kind}</b>\n` +
+      `<b>${escapeHtml(params.name)}</b> — ${escapeHtml(params.email)}\n` +
+      `${escapeHtml(params.message)}`
+  );
 }
