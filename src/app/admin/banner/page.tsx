@@ -4,6 +4,7 @@ import { getAllBannersForAdmin } from "@/lib/queries";
 import { deleteBanner } from "@/actions/banner";
 import { formatDateTimeUz } from "@/lib/utils";
 import DeleteButton from "@/components/admin/DeleteButton";
+import FlashToast from "@/components/FlashToast";
 
 function status(startAt: Date, endAt: Date): { label: string; className: string } {
   const now = new Date();
@@ -17,6 +18,8 @@ export default async function AdminBannerListPage() {
 
   return (
     <div>
+      <FlashToast param="created" message="Banner qo'shildi ✓" />
+      <FlashToast param="saved" message="Banner saqlandi ✓" />
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold text-ink">Reklama bannerlari</h1>
@@ -49,7 +52,7 @@ export default async function AdminBannerListPage() {
                 <Link href={`/admin/banner/${b.id}`} className="text-sm font-medium text-primary hover:underline">
                   Tahrirlash
                 </Link>
-                <DeleteButton action={deleteBanner.bind(null, b.id)} />
+                <DeleteButton action={deleteBanner.bind(null, b.id)} successMessage="Banner o'chirildi" />
               </div>
             </div>
           );

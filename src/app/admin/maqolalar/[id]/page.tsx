@@ -3,6 +3,7 @@ import { getArticleForEdit, getCategories } from "@/lib/queries";
 import { updateArticle, deleteArticle } from "@/actions/articles";
 import ArticleForm from "@/components/admin/ArticleForm";
 import DeleteButton from "@/components/admin/DeleteButton";
+import FlashToast from "@/components/FlashToast";
 
 export default async function EditArticlePage({
   params,
@@ -16,13 +17,15 @@ export default async function EditArticlePage({
 
   return (
     <div>
+      <FlashToast param="created" message="Maqola yaratildi ✓" />
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold text-ink">Maqolani tahrirlash</h1>
-        <DeleteButton action={deleteArticle.bind(null, article.id)}>Maqolani o&apos;chirish</DeleteButton>
+        <DeleteButton action={deleteArticle.bind(null, article.id)} successMessage="Maqola o&apos;chirildi">Maqolani o&apos;chirish</DeleteButton>
       </div>
       <ArticleForm
         action={updateArticle.bind(null, article.id)}
         categories={categories}
+        mode="edit"
         initial={{
           title: article.title,
           slug: article.slug,

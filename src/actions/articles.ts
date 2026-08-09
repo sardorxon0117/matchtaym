@@ -79,7 +79,7 @@ export async function createArticle(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/admin/maqolalar");
-  redirect(`/admin/maqolalar/${article.id}`);
+  redirect(`/admin/maqolalar/${article.id}?created=1`);
 }
 
 export async function updateArticle(id: string, formData: FormData) {

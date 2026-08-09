@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { marked } from "marked";
 import { uploadImageToS3 } from "@/lib/upload-client";
+import { useToast } from "@/components/Toast";
 
 const TOOLBAR: { label: string; wrap: [string, string] }[] = [
   { label: "B", wrap: ["**", "**"] },
@@ -26,6 +27,7 @@ export default function MarkdownEditor({
   const [uploading, setUploading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
 
   function applyWrap(prefix: string, suffix: string) {
     const el = textareaRef.current;
@@ -51,8 +53,9 @@ export default function MarkdownEditor({
     try {
       const url = await uploadImageToS3(file);
       applyWrap(`\n![rasm](${url})\n`, "");
-    } catch {
-      // silent — toolbar action, non-blocking
+      toast.show("Rasm qo'shildi ✓");
+    } catch (err) {
+      toast.show(err instanceof Error ? err.message : "Rasm yuklanmadi", "error");
     } finally {
       setUploading(false);
     }

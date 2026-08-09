@@ -70,6 +70,7 @@ export default function CommentItem({
                 action={deleteComment.bind(null, comment.id)}
                 confirmText="Izohni o'chirishni tasdiqlaysizmi?"
                 className="text-xs font-medium text-red-600 hover:underline"
+                successMessage="Izoh o'chirildi"
               >
                 O&apos;chirish
               </DeleteButton>

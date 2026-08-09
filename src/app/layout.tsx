@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fredoka, Inter } from "next/font/google";
+import { ToastProvider } from "@/components/Toast";
 import "./globals.css";
 
 const fredoka = Fredoka({
@@ -43,7 +44,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="uz"
       className={`${fredoka.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-cream text-ink">{children}</body>
+      <body className="min-h-full flex flex-col bg-cream text-ink">
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   );
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getFeedMatches } from "@/lib/matches";
-import MatchRow from "@/components/MatchRow";
+import MatchTile from "@/components/MatchTile";
 
 export const metadata: Metadata = { title: "O'yinlar" };
 export const revalidate = 300;
@@ -9,14 +9,14 @@ export default async function MatchesPage() {
   const matches = await getFeedMatches();
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
       <h1 className="mb-2 font-heading text-2xl font-bold text-ink sm:text-3xl">O&apos;yinlar</h1>
-      <p className="mb-6 text-ink-soft">Yaqin kunlardagi futbol o&apos;yinlari</p>
+      <p className="mb-6 text-ink-soft">Barcha futbol o&apos;yinlari, tartib bilan</p>
 
       {matches.length > 0 ? (
-        <div className="divide-y divide-ink/5 rounded-card border border-ink/10 bg-white px-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {matches.map((m, i) => (
-            <MatchRow key={i} match={m} />
+            <MatchTile key={i} match={m} />
           ))}
         </div>
       ) : (

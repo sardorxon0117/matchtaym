@@ -37,7 +37,7 @@ export default function HeroPromoBox({ matches, banners }: { matches: FeedMatch[
 
         {matches.length > 0 ? (
           <div className="divide-y divide-ink/5">
-            {matches.slice(0, 4).map((m, i) => (
+            {matches.map((m, i) => (
               <MatchRow key={i} match={m} />
             ))}
           </div>

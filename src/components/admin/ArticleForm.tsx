@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import ImageUploader from "./ImageUploader";
 import MarkdownEditor from "./MarkdownEditor";
+import { useToast } from "@/components/Toast";
 
 type Category = { id: string; name: string };
 
@@ -10,8 +11,9 @@ export default function ArticleForm({
   action,
   categories,
   initial,
+  mode = "create",
 }: {
-  action: (formData: FormData) => void;
+  action: (formData: FormData) => void | Promise<void>;
   categories: Category[];
   initial?: {
     title?: string;
@@ -25,11 +27,29 @@ export default function ArticleForm({
     metaTitle?: string;
     metaDesc?: string;
   };
+  /** "create" redirects on success (native form submit, flash toast lands on the next page).
+   *  "edit" saves in place — submitted via JS so we can toast immediately. */
+  mode?: "create" | "edit";
 }) {
   const [coverImage, setCoverImage] = useState(initial?.coverImage ?? "");
+  const [pending, startTransition] = useTransition();
+  const toast = useToast();
+
+  function handleEditSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    startTransition(async () => {
+      try {
+        await action(formData);
+        toast.show("Saqlandi ✓");
+      } catch (err) {
+        toast.show(err instanceof Error ? err.message : "Saqlashda xatolik", "error");
+      }
+    });
+  }
 
   return (
-    <form action={action} className="space-y-6">
+    <form action={mode === "create" ? action : undefined} onSubmit={mode === "edit" ? handleEditSubmit : undefined} className="space-y-6">
       <div className="grid gap-6 md:grid-cols-3">
         <div className="space-y-6 md:col-span-2">
           <Field label="Sarlavha">
@@ -100,8 +120,12 @@ export default function ArticleForm({
             </Field>
           </div>
 
-          <button type="submit" className="w-full rounded-pill bg-primary px-5 py-3 text-sm font-semibold text-white hover:bg-primary-dark">
-            Saqlash
+          <button
+            type="submit"
+            disabled={pending}
+            className="w-full rounded-pill bg-primary px-5 py-3 text-sm font-semibold text-white hover:bg-primary-dark disabled:opacity-60"
+          >
+            {pending ? "Saqlanmoqda…" : "Saqlash"}
           </button>
         </div>
       </div>

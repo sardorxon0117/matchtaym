@@ -38,7 +38,7 @@ export async function createTransfer(formData: FormData) {
 
   revalidatePath("/kategoriya/transferlar");
   revalidatePath("/admin/transferlar");
-  redirect("/admin/transferlar");
+  redirect("/admin/transferlar?created=1");
 }
 
 export async function updateTransfer(id: string, formData: FormData) {
@@ -62,7 +62,7 @@ export async function updateTransfer(id: string, formData: FormData) {
 
   revalidatePath("/kategoriya/transferlar");
   revalidatePath("/admin/transferlar");
-  redirect("/admin/transferlar");
+  redirect("/admin/transferlar?saved=1");
 }
 
 export async function deleteTransfer(id: string) {

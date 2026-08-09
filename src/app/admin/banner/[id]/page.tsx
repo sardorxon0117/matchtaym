@@ -17,7 +17,7 @@ export default async function EditBannerPage({
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold text-ink">Bannerni tahrirlash</h1>
-        <DeleteButton action={deleteBanner.bind(null, banner.id)}>O&apos;chirish</DeleteButton>
+        <DeleteButton action={deleteBanner.bind(null, banner.id)} successMessage="Banner o&apos;chirildi">O&apos;chirish</DeleteButton>
       </div>
       <BannerForm
         action={updateBanner.bind(null, banner.id)}

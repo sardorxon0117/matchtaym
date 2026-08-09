@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { getActiveBanners } from "@/lib/queries";
 import { getFeedMatches } from "@/lib/matches";
+import { pickClosestMatches } from "@/lib/match-format";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileAdBanner from "@/components/MobileAdBanner";
@@ -9,6 +10,7 @@ import type { HeaderUser } from "@/components/UserMenu";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const [session, banners, matches] = await Promise.all([auth(), getActiveBanners(), getFeedMatches()]);
+  const heroMatches = pickClosestMatches(matches, 3);
 
   const user: HeaderUser | null = session?.user
     ? {
@@ -28,7 +30,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <div className="mx-auto flex w-full max-w-[88rem] items-start gap-6 px-0 md:px-6">
         <div className="min-w-0 flex-1">{children}</div>
         <aside className="sticky top-20 hidden w-[300px] shrink-0 py-8 md:block">
-          <HeroPromoBox matches={matches} banners={banners} />
+          <HeroPromoBox matches={heroMatches} banners={banners} />
         </aside>
       </div>
 

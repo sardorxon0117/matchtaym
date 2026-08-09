@@ -53,7 +53,7 @@ export default async function AdminArticlesPage() {
                     <Link href={`/admin/maqolalar/${a.id}`} className="text-sm font-medium text-primary hover:underline">
                       Tahrirlash
                     </Link>
-                    <DeleteButton action={deleteArticle.bind(null, a.id)} />
+                    <DeleteButton action={deleteArticle.bind(null, a.id)} successMessage="Maqola o'chirildi" />
                   </div>
                 </td>
               </tr>

@@ -66,7 +66,7 @@ export default async function AdminCommentsPage({
                 <Link href={`/maqola/${c.article.slug}`} className="text-xs font-medium text-primary hover:underline">
                   {c.article.title} →
                 </Link>
-                <DeleteButton action={deleteComment.bind(null, c.id)} className="text-xs font-medium text-red-600 hover:underline" />
+                <DeleteButton action={deleteComment.bind(null, c.id)} className="text-xs font-medium text-red-600 hover:underline" successMessage="Izoh o'chirildi" />
               </div>
             </div>
             <p className="whitespace-pre-wrap text-sm text-ink-soft">{c.content}</p>
@@ -78,7 +78,7 @@ export default async function AdminCommentsPage({
                     <p className="text-sm text-ink-soft">
                       <span className="font-semibold text-ink">{r.author.name}:</span> {r.content}
                     </p>
-                    <DeleteButton action={deleteComment.bind(null, r.id)} className="shrink-0 text-xs font-medium text-red-600 hover:underline" />
+                    <DeleteButton action={deleteComment.bind(null, r.id)} className="shrink-0 text-xs font-medium text-red-600 hover:underline" successMessage="Javob o'chirildi" />
                   </div>
                 ))}
               </div>

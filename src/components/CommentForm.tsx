@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { createComment } from "@/actions/comments";
+import { useToast } from "@/components/Toast";
 
 export default function CommentForm({
   articleId,
@@ -22,11 +23,17 @@ export default function CommentForm({
   const [error, formAction, pending] = useActionState(action, undefined);
   const formRef = useRef<HTMLFormElement>(null);
   const wasPending = useRef(false);
+  const toast = useToast();
 
   useEffect(() => {
-    if (wasPending.current && !pending && !error) {
-      formRef.current?.reset();
-      onDone?.();
+    if (wasPending.current && !pending) {
+      if (error) {
+        toast.show(error, "error");
+      } else {
+        formRef.current?.reset();
+        toast.show(parentId ? "Javob yuborildi ✓" : "Izoh yuborildi ✓");
+        onDone?.();
+      }
     }
     wasPending.current = pending;
     // eslint-disable-next-line react-hooks/exhaustive-deps

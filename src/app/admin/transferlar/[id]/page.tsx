@@ -22,7 +22,7 @@ export default async function EditTransferPage({
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold text-ink">Transferni tahrirlash</h1>
-        <DeleteButton action={deleteTransfer.bind(null, transfer.id)}>O&apos;chirish</DeleteButton>
+        <DeleteButton action={deleteTransfer.bind(null, transfer.id)} successMessage="Transfer o&apos;chirildi">O&apos;chirish</DeleteButton>
       </div>
       <TransferForm
         action={updateTransfer.bind(null, transfer.id)}

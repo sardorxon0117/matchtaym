@@ -35,7 +35,7 @@ export async function createBanner(formData: FormData) {
   });
 
   revalidatePath("/", "layout");
-  redirect("/admin/banner");
+  redirect("/admin/banner?created=1");
 }
 
 export async function updateBanner(id: string, formData: FormData) {
@@ -54,7 +54,7 @@ export async function updateBanner(id: string, formData: FormData) {
   });
 
   revalidatePath("/", "layout");
-  redirect("/admin/banner");
+  redirect("/admin/banner?saved=1");
 }
 
 export async function deleteBanner(id: string) {

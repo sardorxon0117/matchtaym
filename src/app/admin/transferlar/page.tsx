@@ -3,6 +3,7 @@ import { getAllTransfersForAdmin } from "@/lib/queries";
 import { deleteTransfer } from "@/actions/transfers";
 import { formatDateUz } from "@/lib/utils";
 import DeleteButton from "@/components/admin/DeleteButton";
+import FlashToast from "@/components/FlashToast";
 
 const STATUS_LABEL: Record<string, string> = {
   RUMOR: "Mish-mish",
@@ -15,6 +16,8 @@ export default async function AdminTransfersPage() {
 
   return (
     <div>
+      <FlashToast param="created" message="Transfer qo'shildi ✓" />
+      <FlashToast param="saved" message="Transfer saqlandi ✓" />
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-heading text-2xl font-bold text-ink">Transferlar</h1>
         <Link href="/admin/transferlar/yangi" className="rounded-pill bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark">
@@ -49,7 +52,7 @@ export default async function AdminTransfersPage() {
                     <Link href={`/admin/transferlar/${t.id}`} className="text-sm font-medium text-primary hover:underline">
                       Tahrirlash
                     </Link>
-                    <DeleteButton action={deleteTransfer.bind(null, t.id)} />
+                    <DeleteButton action={deleteTransfer.bind(null, t.id)} successMessage="Transfer o'chirildi" />
                   </div>
                 </td>
               </tr>

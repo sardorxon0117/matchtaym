@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { uploadImageToS3 } from "@/lib/upload-client";
+import { useToast } from "@/components/Toast";
 
 export default function ImageUploader({
   name,
@@ -18,6 +19,7 @@ export default function ImageUploader({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
 
   async function handleFile(file: File) {
     setLoading(true);
@@ -25,8 +27,11 @@ export default function ImageUploader({
     try {
       const url = await uploadImageToS3(file);
       onChange(url);
+      toast.show("Rasm yuklandi ✓");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Xatolik yuz berdi");
+      const message = err instanceof Error ? err.message : "Xatolik yuz berdi";
+      setError(message);
+      toast.show(message, "error");
     } finally {
       setLoading(false);
     }
