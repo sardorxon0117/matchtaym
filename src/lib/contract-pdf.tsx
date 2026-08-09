@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   sigCol: { flex: 1, position: "relative" },
   sigLabel: { fontWeight: 700, marginBottom: 3 },
   small: { fontSize: 8.5, color: "#666" },
-  stamp: { position: "absolute", top: -12, left: 2, width: 78, height: 78, opacity: 0.85, transform: "rotate(-9deg)" },
+  stamp: { position: "absolute", top: 16, left: 2, width: 64, height: 64, opacity: 0.6, transform: "rotate(-9deg)" },
 });
 
 const CLAUSES = (contract: ContractDocumentData, period: string) => [

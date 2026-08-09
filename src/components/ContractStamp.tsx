@@ -11,7 +11,7 @@ export default function ContractStamp({ className = "" }: { className?: string }
       alt=""
       aria-hidden="true"
       className={className}
-      style={{ transform: "rotate(-9deg)", opacity: 0.85 }}
+      style={{ transform: "rotate(-9deg)", opacity: 0.6 }}
     />
   );
 }
