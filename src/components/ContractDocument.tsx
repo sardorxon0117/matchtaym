@@ -130,7 +130,7 @@ export default function ContractDocument({ contract }: { contract: ContractDocum
           <p className="mb-1 font-semibold">IJROCHI</p>
           <p>MatchTaym jamoasi</p>
           {contract.status === "CONFIRMED" && (
-            <ContractStamp className="pointer-events-none absolute -top-2 left-1 h-16 w-16" />
+            <ContractStamp className="pointer-events-none absolute -top-4 left-1 h-24 w-24" />
           )}
         </div>
         <div>
