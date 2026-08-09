@@ -33,11 +33,18 @@ export default function CommentItem({
   const isStaffViewer = !!currentUser && STAFF_ROLES.has(currentUser.role);
   const canDelete = !!currentUser && (currentUser.id === comment.author.id || isStaffViewer);
   const initial = comment.author.name?.[0]?.toUpperCase() ?? "?";
+  // Staff replies are branded as the team, not the individual — no personal
+  // name/photo shown publicly.
+  const displayName = isStaffAuthor ? "MatchTaym jamoasi" : comment.author.name;
 
   return (
     <div className={depth > 0 ? "ml-6 border-l border-ink/10 pl-4 sm:ml-10" : ""}>
       <div className="flex gap-3 py-4">
-        {comment.author.image ? (
+        {isStaffAuthor ? (
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary p-1.5">
+            <Image src="/logo-mark.svg" alt="" width={22} height={22} className="h-full w-full brightness-0 invert" />
+          </span>
+        ) : comment.author.image ? (
           <Image src={comment.author.image} alt="" width={36} height={36} className="h-9 w-9 rounded-full" />
         ) : (
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary">
@@ -46,12 +53,7 @@ export default function CommentItem({
         )}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm font-semibold text-ink">{comment.author.name}</span>
-            {isStaffAuthor && (
-              <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-white">
-                MatchTaym jamoasi
-              </span>
-            )}
+            <span className="text-sm font-semibold text-ink">{displayName}</span>
             <span className="text-xs text-ink-soft/60">{formatRelativeUz(comment.createdAt)}</span>
           </div>
           <p className="mt-1 whitespace-pre-wrap break-words text-sm text-ink-soft">{comment.content}</p>
