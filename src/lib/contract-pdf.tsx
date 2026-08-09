@@ -5,10 +5,11 @@
 // (isomorphic-dompurify's jsdom) crashing only in Vercel's serverless
 // runtime, so PDF generation stays as plain, portable JS that runs the same
 // in the browser everywhere.
-import { Document, Page, Text, View, StyleSheet, pdf } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Svg, Circle, Path, StyleSheet, pdf } from "@react-pdf/renderer";
 import type { ContractDocumentData } from "@/components/ContractDocument";
 import { formatUzs } from "@/lib/contract-format";
 import { formatDateTimeUz } from "@/lib/utils";
+import { layoutArcText, STAMP } from "@/lib/stamp-geometry";
 
 const BLANK = "________________";
 
@@ -21,11 +22,12 @@ const styles = StyleSheet.create({
   clause: { flexDirection: "row", marginBottom: 8 },
   clauseNum: { width: 16, fontWeight: 700 },
   clauseBody: { flex: 1 },
-  statusBox: { marginTop: 14, padding: 10, borderWidth: 1, borderColor: "#ccc", borderRadius: 4 },
+  statusPara: { marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: "#ccc" },
   signatures: { flexDirection: "row", marginTop: 24, paddingTop: 14, borderTopWidth: 1, borderTopColor: "#ccc" },
-  sigCol: { flex: 1 },
+  sigCol: { flex: 1, position: "relative" },
   sigLabel: { fontWeight: 700, marginBottom: 3 },
   small: { fontSize: 8.5, color: "#666" },
+  stamp: { position: "absolute", top: -14, left: 55, width: 92, height: 92, opacity: 0.82, transform: "rotate(-9deg)" },
 });
 
 const CLAUSES = (contract: ContractDocumentData, period: string) => [
@@ -60,13 +62,60 @@ const CLAUSES = (contract: ContractDocumentData, period: string) => [
 
 function paymentStatusText(contract: ContractDocumentData): string | null {
   if (contract.status === "CONFIRMED" && contract.totalAmountUzs !== null) {
-    return `To'lov: ${formatUzs(contract.totalAmountUzs)} - ${
+    return `Ushbu shartnoma bo'yicha ${formatUzs(contract.totalAmountUzs)} to'lovi ${
       contract.paymentConfirmedAt ? formatDateTimeUz(contract.paymentConfirmedAt) : ""
-    } sanada tasdiqlandi.`;
+    } sanada to'liq amalga oshirilgan va Ijrochi tomonidan tasdiqlangan.`;
   }
-  if (contract.status === "PAYMENT_SUBMITTED") return "To'lov cheki yuklandi, tasdiqlanishi kutilmoqda.";
-  if (contract.status === "AWAITING_PAYMENT" || contract.status === "REJECTED") return "To'lov hali amalga oshirilmagan.";
+  if (contract.status === "PAYMENT_SUBMITTED") {
+    return "To'lovni tasdiqlovchi hujjat (chek) taqdim etilgan, Ijrochi tomonidan tekshirilmoqda.";
+  }
+  if (contract.status === "AWAITING_PAYMENT" || contract.status === "REJECTED") {
+    return "Ushbu shartnoma bo'yicha to'lov hali amalga oshirilmagan.";
+  }
   return null;
+}
+
+/** Same arc-text math as ContractStamp.tsx (the HTML version) — react-pdf has no <textPath>. */
+function PdfStamp() {
+  const topGlyphs = layoutArcText(STAMP.topText, STAMP.cx, STAMP.cy, STAMP.textRadius, "top");
+  const bottomGlyphs = layoutArcText(STAMP.bottomText, STAMP.cx, STAMP.cy, STAMP.textRadius, "bottom");
+
+  return (
+    <Svg viewBox={`0 0 ${STAMP.size} ${STAMP.size}`} style={styles.stamp}>
+      <Circle
+        cx={STAMP.cx}
+        cy={STAMP.cy}
+        r={STAMP.outerRadius}
+        stroke={STAMP.color}
+        strokeWidth={STAMP.outerStrokeWidth}
+        fill="none"
+      />
+      <Circle
+        cx={STAMP.cx}
+        cy={STAMP.cy}
+        r={STAMP.innerRadius}
+        stroke={STAMP.color}
+        strokeWidth={STAMP.innerStrokeWidth}
+        fill="none"
+      />
+      <Path d={STAMP.logoPath} transform={STAMP.logoTransform} fill={STAMP.color} />
+      {[...topGlyphs, ...bottomGlyphs].map((g, i) => (
+        <Text
+          key={i}
+          x={g.x}
+          y={g.y}
+          fill={STAMP.color}
+          textAnchor="middle"
+          style={{ fontSize: STAMP.fontSize, fontFamily: "Helvetica-Bold" }}
+          transform={`rotate(${g.rotationDeg}, ${g.x}, ${g.y})`}
+        >
+          {g.char}
+        </Text>
+      ))}
+      <Circle cx={STAMP.cx - STAMP.textRadius} cy={STAMP.cy} r={2} fill={STAMP.color} />
+      <Circle cx={STAMP.cx + STAMP.textRadius} cy={STAMP.cy} r={2} fill={STAMP.color} />
+    </Svg>
+  );
 }
 
 function ContractPdfDocument({ contract }: { contract: ContractDocumentData }) {
@@ -107,13 +156,15 @@ function ContractPdfDocument({ contract }: { contract: ContractDocumentData }) {
         ))}
 
         {statusText && (
-          <View style={styles.statusBox}>
-            <Text>{statusText}</Text>
-          </View>
+          <Text style={styles.statusPara}>
+            <Text style={styles.bold}>To&apos;lov holati. </Text>
+            {statusText}
+          </Text>
         )}
 
         <View style={styles.signatures}>
           <View style={styles.sigCol}>
+            {contract.status === "CONFIRMED" && <PdfStamp />}
             <Text style={styles.sigLabel}>IJROCHI</Text>
             <Text>MatchTaym jamoasi</Text>
           </View>

@@ -1,5 +1,6 @@
 import { formatUzs } from "@/lib/contract-format";
 import { formatDateTimeUz } from "@/lib/utils";
+import ContractStamp from "@/components/ContractStamp";
 
 export type ContractDocumentData = {
   id: string;
@@ -18,30 +19,30 @@ export type ContractDocumentData = {
 
 const BLANK = "________________";
 
-function PaymentStatusLine({ contract }: { contract: ContractDocumentData }) {
+function paymentStatusText(contract: ContractDocumentData): string | null {
   if (contract.status === "CONFIRMED" && contract.totalAmountUzs !== null) {
-    return (
-      <p className="mt-4 rounded-card border border-green-200 bg-green-50 px-4 py-2.5 font-sans text-sm font-semibold text-green-700">
-        ✅ To&apos;lov: {formatUzs(contract.totalAmountUzs)} —{" "}
-        {contract.paymentConfirmedAt ? formatDateTimeUz(contract.paymentConfirmedAt) : ""} sanada tasdiqlandi.
-      </p>
-    );
+    return `Ushbu shartnoma bo'yicha ${formatUzs(contract.totalAmountUzs)} to'lovi ${
+      contract.paymentConfirmedAt ? formatDateTimeUz(contract.paymentConfirmedAt) : ""
+    } sanada to'liq amalga oshirilgan va Ijrochi tomonidan tasdiqlangan.`;
   }
   if (contract.status === "PAYMENT_SUBMITTED") {
-    return (
-      <p className="mt-4 rounded-card border border-amber-200 bg-amber-50 px-4 py-2.5 font-sans text-sm font-semibold text-amber-700">
-        ⏳ To&apos;lov cheki yuklandi, tasdiqlanishi kutilmoqda.
-      </p>
-    );
+    return "To'lovni tasdiqlovchi hujjat (chek) taqdim etilgan, Ijrochi tomonidan tekshirilmoqda.";
   }
   if (contract.status === "AWAITING_PAYMENT" || contract.status === "REJECTED") {
-    return (
-      <p className="mt-4 rounded-card border border-ink/10 bg-cream px-4 py-2.5 font-sans text-sm font-medium text-ink-soft">
-        To&apos;lov hali amalga oshirilmagan.
-      </p>
-    );
+    return "Ushbu shartnoma bo'yicha to'lov hali amalga oshirilmagan.";
   }
   return null;
+}
+
+/** Plain, formal paragraph — same tone as the numbered clauses above it, no badges/colors/emoji. */
+function PaymentStatusLine({ contract }: { contract: ContractDocumentData }) {
+  const text = paymentStatusText(contract);
+  if (!text) return null;
+  return (
+    <p className="mt-4 border-t border-ink/10 pt-4">
+      <span className="font-semibold">To&apos;lov holati.</span> {text}
+    </p>
+  );
 }
 
 /**
@@ -122,9 +123,12 @@ export default function ContractDocument({ contract }: { contract: ContractDocum
       <PaymentStatusLine contract={contract} />
 
       <div className="mt-8 grid gap-6 border-t border-ink/10 pt-6 sm:grid-cols-2">
-        <div>
+        <div className="relative">
           <p className="mb-1 font-semibold">IJROCHI</p>
           <p>MatchTaym jamoasi</p>
+          {contract.status === "CONFIRMED" && (
+            <ContractStamp className="pointer-events-none absolute -top-4 left-16 h-28 w-28 sm:left-24" />
+          )}
         </div>
         <div>
           <p className="mb-1 font-semibold">BUYURTMACHI</p>
