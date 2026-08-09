@@ -43,11 +43,9 @@ export default function ContractStamp({ className = "" }: { className?: string }
           y={g.y}
           transform={`rotate(${g.rotationDeg}, ${g.x}, ${g.y})`}
           fill={STAMP.color}
-          fontSize={STAMP.fontSize}
-          fontWeight={700}
           textAnchor="middle"
           dominantBaseline="middle"
-          fontFamily="Georgia, serif"
+          style={{ fontSize: STAMP.fontSize, fontWeight: 700, fontFamily: "var(--font-heading)" }}
         >
           {g.char}
         </text>
@@ -59,11 +57,9 @@ export default function ContractStamp({ className = "" }: { className?: string }
           y={g.y}
           transform={`rotate(${g.rotationDeg}, ${g.x}, ${g.y})`}
           fill={STAMP.color}
-          fontSize={STAMP.fontSize}
-          fontWeight={700}
           textAnchor="middle"
           dominantBaseline="middle"
-          fontFamily="Georgia, serif"
+          style={{ fontSize: STAMP.fontSize, fontWeight: 700, fontFamily: "var(--font-heading)" }}
         >
           {g.char}
         </text>

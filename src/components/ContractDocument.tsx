@@ -60,7 +60,10 @@ export default function ContractDocument({ contract }: { contract: ContractDocum
       : "hali belgilanmagan";
 
   return (
-    <div className="mx-auto max-w-[210mm] rounded-card border border-ink/10 bg-white p-6 font-serif text-sm leading-relaxed text-ink shadow-sm sm:p-10 print:border-0 print:shadow-none">
+    <div
+      className="mx-auto max-w-[210mm] rounded-card border border-ink/10 bg-white p-6 text-sm leading-relaxed text-ink shadow-sm sm:p-10 print:border-0 print:shadow-none"
+      style={{ fontFamily: "'Times New Roman', Times, serif" }}
+    >
       <h1 className="mb-1 text-center text-lg font-bold uppercase tracking-wide">
         Reklama xizmatlarini ko&apos;rsatish to&apos;g&apos;risida shartnoma
       </h1>

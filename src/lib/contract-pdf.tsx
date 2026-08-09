@@ -5,16 +5,22 @@
 // (isomorphic-dompurify's jsdom) crashing only in Vercel's serverless
 // runtime, so PDF generation stays as plain, portable JS that runs the same
 // in the browser everywhere.
-import { Document, Page, Text, View, Svg, Circle, Path, StyleSheet, pdf } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Svg, Circle, Path, StyleSheet, Font, pdf } from "@react-pdf/renderer";
 import type { ContractDocumentData } from "@/components/ContractDocument";
 import { formatUzs } from "@/lib/contract-format";
 import { formatDateTimeUz } from "@/lib/utils";
 import { layoutArcText, STAMP } from "@/lib/stamp-geometry";
 
+// Same face used for the site's own headings/logo (next/font/google's
+// Fredoka) — vendored as a static file so react-pdf (running in the
+// browser, not Node) can fetch it by URL. Only the stamp text uses it; the
+// rest of the document stays on the built-in Times-Roman standard font.
+Font.register({ family: "Fredoka", src: "/fonts/Fredoka-Bold.ttf" });
+
 const BLANK = "________________";
 
 const styles = StyleSheet.create({
-  page: { padding: 48, fontSize: 10.5, lineHeight: 1.5, color: "#1a1a1a" },
+  page: { padding: 48, fontFamily: "Times-Roman", fontSize: 10.5, lineHeight: 1.5, color: "#1a1a1a" },
   title: { fontSize: 14, fontWeight: 700, textAlign: "center", marginBottom: 4, textTransform: "uppercase" },
   subtitle: { fontSize: 8.5, textAlign: "center", marginBottom: 20, color: "#666" },
   bold: { fontWeight: 700 },
@@ -106,7 +112,7 @@ function PdfStamp() {
           y={g.y}
           fill={STAMP.color}
           textAnchor="middle"
-          style={{ fontSize: STAMP.fontSize, fontFamily: "Helvetica-Bold" }}
+          style={{ fontSize: STAMP.fontSize, fontFamily: "Fredoka" }}
           transform={`rotate(${g.rotationDeg}, ${g.x}, ${g.y})`}
         >
           {g.char}
