@@ -5,7 +5,7 @@
 // (isomorphic-dompurify's jsdom) crashing only in Vercel's serverless
 // runtime, so PDF generation stays as plain, portable JS that runs the same
 // in the browser everywhere.
-import { Document, Page, Text, View, Image, StyleSheet, pdf } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, pdf } from "@react-pdf/renderer";
 import type { ContractDocumentData } from "@/components/ContractDocument";
 import { formatUzs } from "@/lib/contract-format";
 import { formatDateTimeUz } from "@/lib/utils";
@@ -23,10 +23,9 @@ const styles = StyleSheet.create({
   clauseBody: { flex: 1 },
   statusPara: { marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: "#ccc" },
   signatures: { flexDirection: "row", marginTop: 24, paddingTop: 14, borderTopWidth: 1, borderTopColor: "#ccc" },
-  sigCol: { flex: 1, position: "relative" },
+  sigCol: { flex: 1 },
   sigLabel: { fontWeight: 700, marginBottom: 3 },
   small: { fontSize: 8.5, color: "#666" },
-  stamp: { position: "absolute", top: 16, left: 2, width: 64, height: 64, opacity: 0.6, transform: "rotate(-9deg)" },
 });
 
 const CLAUSES = (contract: ContractDocumentData, period: string) => [
@@ -72,11 +71,6 @@ function paymentStatusText(contract: ContractDocumentData): string | null {
     return "Ushbu shartnoma bo'yicha to'lov hali amalga oshirilmagan.";
   }
   return null;
-}
-
-function PdfStamp() {
-  // eslint-disable-next-line jsx-a11y/alt-text -- this is @react-pdf/renderer's Image (PDF content), not a DOM <img>; it has no alt prop
-  return <Image src="/stamp-mark.png" style={styles.stamp} />;
 }
 
 function ContractPdfDocument({ contract }: { contract: ContractDocumentData }) {
@@ -125,7 +119,6 @@ function ContractPdfDocument({ contract }: { contract: ContractDocumentData }) {
 
         <View style={styles.signatures}>
           <View style={styles.sigCol}>
-            {contract.status === "CONFIRMED" && <PdfStamp />}
             <Text style={styles.sigLabel}>IJROCHI</Text>
             <Text>MatchTaym jamoasi</Text>
           </View>

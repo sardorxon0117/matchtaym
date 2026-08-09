@@ -1,6 +1,5 @@
 import { formatUzs } from "@/lib/contract-format";
 import { formatDateTimeUz } from "@/lib/utils";
-import ContractStamp from "@/components/ContractStamp";
 
 export type ContractDocumentData = {
   id: string;
@@ -126,12 +125,9 @@ export default function ContractDocument({ contract }: { contract: ContractDocum
       <PaymentStatusLine contract={contract} />
 
       <div className="mt-8 grid gap-6 border-t border-ink/10 pt-6 sm:grid-cols-2">
-        <div className="relative">
+        <div>
           <p className="mb-1 font-semibold">IJROCHI</p>
           <p>MatchTaym jamoasi</p>
-          {contract.status === "CONFIRMED" && (
-            <ContractStamp className="pointer-events-none absolute top-5 left-1 h-20 w-20" />
-          )}
         </div>
         <div>
           <p className="mb-1 font-semibold">BUYURTMACHI</p>
