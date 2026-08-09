@@ -30,7 +30,17 @@ Sayt: http://localhost:3000, admin panel: http://localhost:3000/admin/login, o'q
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` — Google orqali kirish uchun (bo'sh qoldirilsa, Google tugmasi ko'rinmaydi). Google Cloud Console > APIs & Services > Credentials'dan olinadi. Redirect URI: `<domen>/api/auth/callback/google`
 - `ADMIN_EMAIL`, `ADMIN_NAME`, `ADMIN_PASSWORD` — faqat `prisma db seed` uchun ishlatiladi (birinchi admin hisobini yaratadi)
 - `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_S3_BUCKET` — rasm yuklash uchun
+- `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` — yangi izoh/javoblar shu botga yuboriladi (bo'sh qoldirilsa, o'chirilgan)
 - `NEXT_PUBLIC_SITE_URL` — sayt domeni (metadata, sitemap uchun)
+
+### S3 bucket sozlamalari (yangi bucket yaratganda kerak)
+
+Rasm yuklash brauzerdan to'g'ridan-to'g'ri S3'ga (presigned URL orqali) boradi, shuning uchun bucket'da:
+
+1. **Public read** — `uploads/*` prefiksi uchun ommaviy o'qish siyosati (bucket policy)
+2. **CORS** — sayt domenlaridan (`https://<domen>`, `http://localhost:3000`) `PUT`/`GET`/`HEAD` so'rovlariga ruxsat. CORS bo'lmasa brauzerda "blocked by CORS policy" xatosi chiqadi.
+
+Ikkalasi ham bir martalik AWS SDK skripti orqali sozlangan (kodda saqlanmaydi, chunki bu bucket-darajasidagi sozlama). Yangi bucket yoki domen qo'shsangiz, shu ikkalasini qayta sozlash kerak.
 
 ## Loyiha tuzilishi
 
