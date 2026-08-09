@@ -53,6 +53,30 @@ export async function notifyNewDonationInquiry(params: { name: string; email: st
   );
 }
 
+export async function notifyContractSigned(params: {
+  signerName: string;
+  signerEmail: string;
+  startAt: Date;
+  endAt: Date;
+  amount: string;
+  adminUrl: string;
+}) {
+  await sendTelegramMessage(
+    `✍️ <b>Reklama shartnomasi imzolandi</b>\n` +
+      `<b>${escapeHtml(params.signerName)}</b> — ${escapeHtml(params.signerEmail)}\n` +
+      `💰 ${escapeHtml(params.amount)}\n\n` +
+      `To'lov kutilmoqda.\n${params.adminUrl}`
+  );
+}
+
+export async function notifyPaymentSubmitted(params: { signerName: string; amount: string; adminUrl: string }) {
+  await sendTelegramMessage(
+    `💳 <b>To'lov cheki yuklandi</b>\n` +
+      `<b>${escapeHtml(params.signerName)}</b> — ${escapeHtml(params.amount)}\n\n` +
+      `Tasdiqlash kerak.\n${params.adminUrl}`
+  );
+}
+
 export async function notifyNewFeedback(params: {
   name: string;
   email: string;

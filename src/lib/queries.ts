@@ -254,6 +254,22 @@ export async function getDashboardStats() {
   };
 }
 
+export async function getAdContracts() {
+  return prisma.adContract.findMany({ orderBy: { createdAt: "desc" } });
+}
+
+export async function getAdContractById(id: string) {
+  return prisma.adContract.findUnique({ where: { id } });
+}
+
+export async function getAdContractByToken(token: string) {
+  return prisma.adContract.findUnique({ where: { token } });
+}
+
+export async function getAdContractSettings() {
+  return prisma.adContractSettings.findUnique({ where: { id: "singleton" } });
+}
+
 export async function getDonationInquiries() {
   return prisma.donationInquiry.findMany({ orderBy: { createdAt: "desc" } });
 }

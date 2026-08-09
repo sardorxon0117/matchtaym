@@ -32,6 +32,14 @@ enum FeedbackType {
   COMPLAINT
 }
 
+enum AdContractStatus {
+  PENDING_SIGNATURE // link yaratildi, hali Google orqali tasdiqlanmagan/imzolanmagan
+  AWAITING_PAYMENT // imzolandi, to'lov kutilmoqda
+  PAYMENT_SUBMITTED // chek yuklandi, admin tasdiqlashini kutmoqda
+  CONFIRMED // to'lov tasdiqlandi, reklama joyi band qilindi
+  REJECTED // yuklangan chek rad etildi, qayta yuklash kerak
+}
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -231,4 +239,53 @@ model Feedback {
 
   @@index([createdAt])
   @@map("feedback")
+}
+
+// A per-advertiser ad-placement contract: admin creates it with just an
+// hourly rate, sends the generated link to the advertiser, who verifies
+// their email via Google, fills in their legal name + desired slot, and
+// signs. The signed fields (name/dates/price/agreedAt/agreedIp) are never
+// edited by any code path after signing — that's what makes the contract
+// "frozen" for evidentiary purposes, without needing a separate text
+// snapshot column.
+model AdContract {
+  id            String @id @default(cuid())
+  token         String @unique @default(cuid())
+  hourlyRateUzs Int
+
+  signerEmail    String?
+  signerName     String?
+  startAt        DateTime?
+  endAt          DateTime?
+  totalAmountUzs Int?
+
+  status AdContractStatus @default(PENDING_SIGNATURE)
+
+  agreedAt DateTime?
+  agreedIp String?
+
+  receiptUrl         String?
+  paymentSubmittedAt DateTime?
+  paymentConfirmedAt DateTime?
+  rejectedAt         DateTime?
+  rejectReason       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([startAt, endAt])
+  @@map("ad_contracts")
+}
+
+// Singleton row — the admin's own payment card, shown on signed contracts
+// so the advertiser knows where to transfer money. Editable from the admin
+// panel without a deploy.
+model AdContractSettings {
+  id             String   @id @default("singleton")
+  cardNumber     String?
+  cardHolderName String?
+  updatedAt      DateTime @updatedAt
+
+  @@map("ad_contract_settings")
 }

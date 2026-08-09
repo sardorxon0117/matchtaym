@@ -17,10 +17,14 @@ const ALLOWED_TYPES = new Set([
   "video/mp4",
   "video/webm",
   "video/quicktime",
+  // PDF — ad-contract payment receipts can be a scanned/exported PDF instead
+  // of a photo.
+  "application/pdf",
 ]);
 
 const EXT_OVERRIDES: Record<string, string> = {
   "video/quicktime": "mov",
+  "application/pdf": "pdf",
 };
 
 export function publicUrlFor(key: string): string {
@@ -43,7 +47,9 @@ export async function createPresignedUpload(
   folder = "uploads/articles"
 ): Promise<{ uploadUrl: string; publicUrl: string }> {
   if (!ALLOWED_TYPES.has(contentType)) {
-    throw new Error("Faqat rasm (jpg, png, webp, avif, gif) yoki video (mp4, webm, mov) fayllari qabul qilinadi");
+    throw new Error(
+      "Faqat rasm (jpg, png, webp, avif, gif), video (mp4, webm, mov) yoki PDF fayllari qabul qilinadi"
+    );
   }
 
   const ext = EXT_OVERRIDES[contentType] ?? contentType.split("/")[1];

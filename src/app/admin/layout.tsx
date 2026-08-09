@@ -9,6 +9,7 @@ const NAV = [
   { href: "/admin/transferlar", label: "Transferlar", icon: "🔁" },
   { href: "/admin/izohlar", label: "Izohlar", icon: "💬" },
   { href: "/admin/banner", label: "Reklama banneri", icon: "📣" },
+  { href: "/admin/reklama-shartnomalari", label: "Reklama shartnomalari", icon: "📝" },
   { href: "/admin/donatsiyalar", label: "Donatsiyalar", icon: "💚" },
   { href: "/admin/taklif-shikoyat", label: "Taklif va shikoyat", icon: "📩" },
 ];
