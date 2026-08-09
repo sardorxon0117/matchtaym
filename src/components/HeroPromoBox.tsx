@@ -3,14 +3,14 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { Banner } from "@/generated/prisma/client";
-import type { FeedMatch } from "@/lib/match-format";
+import type { Fixture } from "@/lib/match-format";
 import { useRotatingIndex } from "@/lib/useRotatingIndex";
 import { isVideoUrl } from "@/lib/media";
 import MatchRow from "./MatchRow";
 
 const ROTATE_MS = 5 * 60 * 1000;
 
-export default function HeroPromoBox({ matches, banners }: { matches: FeedMatch[]; banners: Banner[] }) {
+export default function HeroPromoBox({ matches, banners }: { matches: Fixture[]; banners: Banner[] }) {
   const router = useRouter();
   const index = useRotatingIndex(banners.length, ROTATE_MS);
   const activeBanner = banners.length > 0 ? banners[index] : null;
@@ -60,8 +60,8 @@ export default function HeroPromoBox({ matches, banners }: { matches: FeedMatch[
 
         {matches.length > 0 ? (
           <div className="divide-y divide-ink/5">
-            {matches.map((m, i) => (
-              <MatchRow key={i} match={m} />
+            {matches.map((m) => (
+              <MatchRow key={m.id} match={m} />
             ))}
           </div>
         ) : (
