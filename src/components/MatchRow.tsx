@@ -1,5 +1,5 @@
 import type { Fixture } from "@/lib/match-format";
-import { formatKickoffTime, getMatchPhase, statusLabel } from "@/lib/match-format";
+import { formatKickoffDate, formatKickoffTime, getMatchPhase, statusLabel } from "@/lib/match-format";
 
 export default function MatchRow({ match }: { match: Fixture }) {
   const phase = getMatchPhase(match);
@@ -13,13 +13,11 @@ export default function MatchRow({ match }: { match: Fixture }) {
             // eslint-disable-next-line @next/next/no-img-element -- small external competition badge
             <img src={match.leagueLogo} alt="" className="h-3.5 w-3.5 shrink-0 object-contain" />
           )}
-          {formatKickoffTime(match.timestamp)}
+          {formatKickoffDate(match.timestamp)}, {formatKickoffTime(match.timestamp)}
         </span>
-        {started && (
-          <span className={`text-xs font-semibold ${phase === "live" ? "text-green-600" : "text-ink-soft/60"}`}>
-            {statusLabel(match)}
-          </span>
-        )}
+        <span className={`text-xs font-semibold ${phase === "live" ? "text-green-600" : "text-ink-soft/60"}`}>
+          {statusLabel(match)}
+        </span>
       </div>
       <div className="flex items-center justify-between gap-2 text-sm text-ink">
         <div className="flex min-w-0 items-center gap-2.5">

@@ -32,6 +32,22 @@ export default function DonatePage() {
         <DonateInterestForm />
       </section>
 
+      <section className="mb-8 rounded-card border border-ink/10 bg-white p-5 sm:p-6">
+        <h2 className="mb-3 font-heading text-lg font-semibold text-ink">Reklama joylashtirish</h2>
+        <p className="mb-4 text-sm leading-relaxed text-ink-soft">
+          Saytimizda reklama joylashtirmoqchi bo&apos;lsangiz — reklama shartlari, joylari va narxlari haqida
+          ma&apos;lumot olish uchun Telegram orqali to&apos;g&apos;ridan-to&apos;g&apos;ri biz bilan bog&apos;lanishingiz mumkin.
+        </p>
+        <a
+          href="https://t.me/sardorkhon_me"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-pill bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
+        >
+          Telegram orqali murojaat qilish →
+        </a>
+      </section>
+
       <section className="rounded-card border border-ink/10 bg-white p-5 sm:p-6">
         <h2 className="mb-1 font-heading text-lg font-semibold text-ink">Taklif va shikoyatlar</h2>
         <p className="mb-4 text-sm text-ink-soft">
