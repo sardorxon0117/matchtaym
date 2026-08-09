@@ -33,10 +33,17 @@ export default {
 
       return true;
     },
-    jwt({ token, user }) {
+    jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.role = (user as { role?: string }).role;
+      }
+      // Fired by useSession().update(...) — e.g. right after the profile
+      // form saves a new name/avatar, so it shows up without a re-login.
+      if (trigger === "update" && session) {
+        const s = session as { name?: string; image?: string };
+        if (s.name) token.name = s.name;
+        if (s.image !== undefined) token.picture = s.image;
       }
       return token;
     },

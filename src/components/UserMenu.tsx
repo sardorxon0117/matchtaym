@@ -70,6 +70,16 @@ export default function UserMenu({
 
       {open && (
         <div className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-xl border border-ink/10 bg-white py-1 shadow-lg">
+          <Link
+            href="/profil"
+            onClick={() => {
+              setOpen(false);
+              onNavigate?.();
+            }}
+            className="block px-4 py-2 text-sm text-ink-soft hover:bg-cream hover:text-primary"
+          >
+            Profil
+          </Link>
           {STAFF_ROLES.has(user.role) && (
             <Link
               href="/admin"
