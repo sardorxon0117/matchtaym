@@ -5,17 +5,10 @@
 // (isomorphic-dompurify's jsdom) crashing only in Vercel's serverless
 // runtime, so PDF generation stays as plain, portable JS that runs the same
 // in the browser everywhere.
-import { Document, Page, Text, View, Svg, Circle, Path, StyleSheet, Font, pdf } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Image, StyleSheet, pdf } from "@react-pdf/renderer";
 import type { ContractDocumentData } from "@/components/ContractDocument";
 import { formatUzs } from "@/lib/contract-format";
 import { formatDateTimeUz } from "@/lib/utils";
-import { layoutArcText, STAMP } from "@/lib/stamp-geometry";
-
-// Same face used for the site's own headings/logo (next/font/google's
-// Fredoka) — vendored as a static file so react-pdf (running in the
-// browser, not Node) can fetch it by URL. Only the stamp text uses it; the
-// rest of the document stays on the built-in Times-Roman standard font.
-Font.register({ family: "Fredoka", src: "/fonts/Fredoka-Bold.ttf" });
 
 const BLANK = "________________";
 
@@ -33,7 +26,7 @@ const styles = StyleSheet.create({
   sigCol: { flex: 1, position: "relative" },
   sigLabel: { fontWeight: 700, marginBottom: 3 },
   small: { fontSize: 8.5, color: "#666" },
-  stamp: { position: "absolute", top: -14, left: 55, width: 92, height: 92, opacity: 0.82, transform: "rotate(-9deg)" },
+  stamp: { position: "absolute", top: -14, left: 55, width: 92, height: 92, opacity: 0.85, transform: "rotate(-9deg)" },
 });
 
 const CLAUSES = (contract: ContractDocumentData, period: string) => [
@@ -81,47 +74,9 @@ function paymentStatusText(contract: ContractDocumentData): string | null {
   return null;
 }
 
-/** Same arc-text math as ContractStamp.tsx (the HTML version) — react-pdf has no <textPath>. */
 function PdfStamp() {
-  const topGlyphs = layoutArcText(STAMP.topText, STAMP.cx, STAMP.cy, STAMP.textRadius, "top");
-  const bottomGlyphs = layoutArcText(STAMP.bottomText, STAMP.cx, STAMP.cy, STAMP.textRadius, "bottom");
-
-  return (
-    <Svg viewBox={`0 0 ${STAMP.size} ${STAMP.size}`} style={styles.stamp}>
-      <Circle
-        cx={STAMP.cx}
-        cy={STAMP.cy}
-        r={STAMP.outerRadius}
-        stroke={STAMP.color}
-        strokeWidth={STAMP.outerStrokeWidth}
-        fill="none"
-      />
-      <Circle
-        cx={STAMP.cx}
-        cy={STAMP.cy}
-        r={STAMP.innerRadius}
-        stroke={STAMP.color}
-        strokeWidth={STAMP.innerStrokeWidth}
-        fill="none"
-      />
-      <Path d={STAMP.logoPath} transform={STAMP.logoTransform} fill={STAMP.color} />
-      {[...topGlyphs, ...bottomGlyphs].map((g, i) => (
-        <Text
-          key={i}
-          x={g.x}
-          y={g.y}
-          fill={STAMP.color}
-          textAnchor="middle"
-          style={{ fontSize: STAMP.fontSize, fontFamily: "Fredoka" }}
-          transform={`rotate(${g.rotationDeg}, ${g.x}, ${g.y})`}
-        >
-          {g.char}
-        </Text>
-      ))}
-      <Circle cx={STAMP.cx - STAMP.textRadius} cy={STAMP.cy} r={2} fill={STAMP.color} />
-      <Circle cx={STAMP.cx + STAMP.textRadius} cy={STAMP.cy} r={2} fill={STAMP.color} />
-    </Svg>
-  );
+  // eslint-disable-next-line jsx-a11y/alt-text -- this is @react-pdf/renderer's Image (PDF content), not a DOM <img>; it has no alt prop
+  return <Image src="/stamp-mark.png" style={styles.stamp} />;
 }
 
 function ContractPdfDocument({ contract }: { contract: ContractDocumentData }) {
