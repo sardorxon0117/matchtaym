@@ -3,13 +3,20 @@ import type { Fixture } from "./match-format";
 
 const API_BASE = "https://api.football-data.org/v4";
 
-// Premier League, La Liga (Primera Division), Serie A, Bundesliga, Ligue 1.
-const TOP5_COMPETITIONS = "PL,PD,SA,BL1,FL1";
+// Premier League, La Liga, Serie A, Bundesliga, Ligue 1, UEFA Champions League.
+// (Carabao Cup / FA Cup / Conference League / Club World Cup aren't on the
+// free football-data.org plan — checked directly against the account.)
+const COMPETITIONS = ["PL", "PD", "SA", "BL1", "FL1", "CL"] as const;
+
+type CompetitionInfo = {
+  currentSeason: { endDate: string; currentMatchday: number | null } | null;
+};
 
 type RawMatch = {
   id: number;
   utcDate: string;
   status: string;
+  matchday: number | null;
   competition: { id: number; name: string; emblem: string | null };
   homeTeam: { name: string; crest: string | null };
   awayTeam: { name: string; crest: string | null };
@@ -18,9 +25,8 @@ type RawMatch = {
 
 type MatchesResponse = { matches?: RawMatch[] };
 
-function tashkentDateStr(date: Date): string {
-  // en-CA formats as YYYY-MM-DD, which is exactly what the API expects.
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Tashkent" }).format(date);
+function authHeaders(): HeadersInit {
+  return { "X-Auth-Token": process.env.FOOTBALL_API_KEY ?? "" };
 }
 
 function mapMatch(m: RawMatch): Fixture {
@@ -43,36 +49,61 @@ function mapMatch(m: RawMatch): Fixture {
 }
 
 /**
- * Top-5-league fixtures from roughly yesterday through the next week
- * (Tashkent dates), in one request — cached for 30 min. The free
- * football-data.org plan allows 10 requests/minute, so this is comfortably
- * within budget even without caching, but there's no reason to hammer it.
+ * Which matchday is "current" for a competition — changes roughly once a
+ * week, so this is cached far longer than the fixtures themselves. Before a
+ * season starts, the API already reports matchday 1 here, which is exactly
+ * the "show the opening round" behaviour we want with zero special-casing.
  */
-export async function getTop5Fixtures(): Promise<Fixture[]> {
-  const token = process.env.FOOTBALL_API_KEY;
-  if (!token) return [];
-
-  // The free plan caps the range at 10 days — bias it forward (today..+9)
-  // rather than including yesterday, since upcoming fixtures matter more
-  // here than recently-finished ones.
-  const now = new Date();
-  const dateFrom = tashkentDateStr(now);
-  const dateTo = tashkentDateStr(new Date(now.getTime() + 9 * 86400000));
-
+async function getCurrentMatchday(code: string): Promise<number | null> {
   try {
-    const res = await fetch(
-      `${API_BASE}/matches?competitions=${TOP5_COMPETITIONS}&dateFrom=${dateFrom}&dateTo=${dateTo}`,
-      {
-        headers: { "X-Auth-Token": token },
-        next: { revalidate: 1800 },
-        signal: AbortSignal.timeout(6000),
-      }
-    );
+    const res = await fetch(`${API_BASE}/competitions/${code}`, {
+      headers: authHeaders(),
+      next: { revalidate: 6 * 3600 },
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!res.ok) return null;
+    const data: CompetitionInfo = await res.json();
+    const season = data.currentSeason;
+    if (!season || !season.currentMatchday) return null;
+    // A season whose end date has already passed means the API hasn't
+    // rolled over to the next one yet (common for cup competitions between
+    // editions) — skip it rather than showing last season's stale round.
+    if (new Date(season.endDate).getTime() < Date.now()) return null;
+    return season.currentMatchday;
+  } catch (err) {
+    console.error(`football-data.org matchday lookup failed for ${code}:`, err);
+    return null;
+  }
+}
+
+async function getMatchdayFixtures(code: string, matchday: number): Promise<Fixture[]> {
+  try {
+    const res = await fetch(`${API_BASE}/competitions/${code}/matches?matchday=${matchday}`, {
+      headers: authHeaders(),
+      next: { revalidate: 900 }, // 15 min — fresh enough for status/score changes
+      signal: AbortSignal.timeout(6000),
+    });
     if (!res.ok) return [];
     const data: MatchesResponse = await res.json();
-    return (data.matches ?? []).map(mapMatch).sort((a, b) => a.timestamp - b.timestamp);
+    return (data.matches ?? []).map(mapMatch);
   } catch (err) {
-    console.error("football-data.org fetch failed:", err);
+    console.error(`football-data.org fixtures fetch failed for ${code}:`, err);
     return [];
   }
+}
+
+/** Current-round fixtures across the top-5 leagues + Champions League. */
+export async function getTop5Fixtures(): Promise<Fixture[]> {
+  if (!process.env.FOOTBALL_API_KEY) return [];
+
+  const results = await Promise.allSettled(
+    COMPETITIONS.map(async (code) => {
+      const matchday = await getCurrentMatchday(code);
+      if (matchday === null) return [];
+      return getMatchdayFixtures(code, matchday);
+    })
+  );
+
+  const fixtures = results.flatMap((r) => (r.status === "fulfilled" ? r.value : []));
+  return fixtures.sort((a, b) => a.timestamp - b.timestamp);
 }

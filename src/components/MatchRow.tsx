@@ -8,7 +8,13 @@ export default function MatchRow({ match }: { match: Fixture }) {
   return (
     <div className="py-3.5">
       <div className="mb-1.5 flex items-center justify-between">
-        <span className="text-xs font-medium text-ink-soft/60">{formatKickoffTime(match.timestamp)}</span>
+        <span className="flex items-center gap-1.5 text-xs font-medium text-ink-soft/60">
+          {match.leagueLogo && (
+            // eslint-disable-next-line @next/next/no-img-element -- small external competition badge
+            <img src={match.leagueLogo} alt="" className="h-3.5 w-3.5 shrink-0 object-contain" />
+          )}
+          {formatKickoffTime(match.timestamp)}
+        </span>
         {started && (
           <span className={`text-xs font-semibold ${phase === "live" ? "text-green-600" : "text-ink-soft/60"}`}>
             {statusLabel(match)}
