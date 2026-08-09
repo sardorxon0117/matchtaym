@@ -233,13 +233,22 @@ export async function getDashboardStats() {
   };
 }
 
-export async function getAllCommentsForAdmin() {
-  return prisma.comment.findMany({
+export async function getAllCommentsForAdmin(filter: "all" | "answered" | "pending" = "all") {
+  const topLevel = await prisma.comment.findMany({
+    where: { parentId: null },
     orderBy: { createdAt: "desc" },
     take: 300,
     include: {
       author: { select: { name: true, role: true } },
       article: { select: { title: true, slug: true } },
+      replies: {
+        orderBy: { createdAt: "asc" },
+        include: { author: { select: { name: true, role: true } } },
+      },
     },
   });
+
+  if (filter === "answered") return topLevel.filter((c) => c.replies.length > 0);
+  if (filter === "pending") return topLevel.filter((c) => c.replies.length === 0);
+  return topLevel;
 }

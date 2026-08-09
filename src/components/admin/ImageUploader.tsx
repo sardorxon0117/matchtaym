@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
+import { uploadImageToS3 } from "@/lib/upload-client";
 
 export default function ImageUploader({
   name,
@@ -22,12 +23,8 @@ export default function ImageUploader({
     setLoading(true);
     setError(null);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Yuklashda xatolik");
-      onChange(data.url);
+      const url = await uploadImageToS3(file);
+      onChange(url);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Xatolik yuz berdi");
     } finally {

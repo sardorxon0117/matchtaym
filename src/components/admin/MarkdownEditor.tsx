@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { marked } from "marked";
+import { uploadImageToS3 } from "@/lib/upload-client";
 
 const TOOLBAR: { label: string; wrap: [string, string] }[] = [
   { label: "B", wrap: ["**", "**"] },
@@ -48,12 +49,8 @@ export default function MarkdownEditor({
   async function handleImageUpload(file: File) {
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      applyWrap(`\n![rasm](${data.url})\n`, "");
+      const url = await uploadImageToS3(file);
+      applyWrap(`\n![rasm](${url})\n`, "");
     } catch {
       // silent — toolbar action, non-blocking
     } finally {
