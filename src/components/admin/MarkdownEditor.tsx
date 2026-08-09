@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { marked } from "marked";
 import { uploadImageToS3 } from "@/lib/upload-client";
 import { useToast } from "@/components/Toast";
+import UploadProgress from "./UploadProgress";
 
 const TOOLBAR: { label: string; wrap: [string, string] }[] = [
   { label: "B", wrap: ["**", "**"] },
@@ -25,6 +26,7 @@ export default function MarkdownEditor({
   const [value, setValue] = useState(defaultValue);
   const [tab, setTab] = useState<"write" | "preview">("write");
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
@@ -50,14 +52,16 @@ export default function MarkdownEditor({
 
   async function handleImageUpload(file: File) {
     setUploading(true);
+    setUploadProgress(0);
     try {
-      const url = await uploadImageToS3(file);
+      const url = await uploadImageToS3(file, setUploadProgress);
       applyWrap(`\n![rasm](${url})\n`, "");
       toast.show("Rasm qo'shildi ✓");
     } catch (err) {
       toast.show(err instanceof Error ? err.message : "Rasm yuklanmadi", "error");
     } finally {
       setUploading(false);
+      setUploadProgress(0);
     }
   }
 
@@ -80,7 +84,7 @@ export default function MarkdownEditor({
           onClick={() => fileRef.current?.click()}
           className="rounded-md px-2.5 py-1.5 text-sm font-semibold text-ink-soft hover:bg-cream disabled:opacity-50"
         >
-          {uploading ? "…" : "🖼 Rasm"}
+          {uploading ? `🖼 ${uploadProgress}%` : "🖼 Rasm"}
         </button>
         <input
           ref={fileRef}
@@ -110,6 +114,8 @@ export default function MarkdownEditor({
           </button>
         </div>
       </div>
+
+      {uploading && <UploadProgress percent={uploadProgress} />}
 
       <input type="hidden" name={name} value={value} />
 

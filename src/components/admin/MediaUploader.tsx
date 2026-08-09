@@ -5,6 +5,7 @@ import Image from "next/image";
 import { uploadImageToS3 } from "@/lib/upload-client";
 import { isVideoUrl } from "@/lib/media";
 import { useToast } from "@/components/Toast";
+import UploadProgress from "./UploadProgress";
 
 export default function MediaUploader({
   name,
@@ -18,6 +19,7 @@ export default function MediaUploader({
   label?: string;
 }) {
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
@@ -25,8 +27,9 @@ export default function MediaUploader({
   async function handleFile(file: File) {
     setLoading(true);
     setError(null);
+    setProgress(0);
     try {
-      const url = await uploadImageToS3(file);
+      const url = await uploadImageToS3(file, setProgress);
       onChange(url);
       toast.show(file.type.startsWith("video/") ? "Video yuklandi ✓" : "Rasm yuklandi ✓");
     } catch (err) {
@@ -35,6 +38,7 @@ export default function MediaUploader({
       toast.show(message, "error");
     } finally {
       setLoading(false);
+      setProgress(0);
     }
   }
 
@@ -80,6 +84,7 @@ export default function MediaUploader({
       >
         {loading ? "Yuklanmoqda…" : value ? "Almashtirish" : "Rasm yoki video yuklash"}
       </button>
+      {loading && <UploadProgress percent={progress} />}
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
   );

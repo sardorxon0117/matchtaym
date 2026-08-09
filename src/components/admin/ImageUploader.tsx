@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { uploadImageToS3 } from "@/lib/upload-client";
 import { useToast } from "@/components/Toast";
+import UploadProgress from "./UploadProgress";
 
 export default function ImageUploader({
   name,
@@ -17,6 +18,7 @@ export default function ImageUploader({
   label?: string;
 }) {
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
@@ -24,8 +26,9 @@ export default function ImageUploader({
   async function handleFile(file: File) {
     setLoading(true);
     setError(null);
+    setProgress(0);
     try {
-      const url = await uploadImageToS3(file);
+      const url = await uploadImageToS3(file, setProgress);
       onChange(url);
       toast.show("Rasm yuklandi ✓");
     } catch (err) {
@@ -34,6 +37,7 @@ export default function ImageUploader({
       toast.show(message, "error");
     } finally {
       setLoading(false);
+      setProgress(0);
     }
   }
 
@@ -73,6 +77,7 @@ export default function ImageUploader({
       >
         {loading ? "Yuklanmoqda…" : value ? "Rasmni almashtirish" : "Rasm yuklash"}
       </button>
+      {loading && <UploadProgress percent={progress} />}
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
   );

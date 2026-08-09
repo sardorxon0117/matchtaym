@@ -80,13 +80,39 @@ async function resizeImageIfNeeded(file: File): Promise<File> {
   }
 }
 
+/** XHR (not fetch) is what actually exposes upload-progress events in the browser. */
+function putWithProgress(url: string, file: File, onProgress?: (percent: number) => void): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", url);
+    xhr.setRequestHeader("Content-Type", file.type);
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) resolve();
+      else reject(new Error("Saqlab bo'lmadi, qayta urinib ko'ring"));
+    };
+    xhr.onerror = () => reject(new Error("Tarmoq xatosi — internetni tekshirib, qayta urinib ko'ring"));
+
+    xhr.send(file);
+  });
+}
+
 /**
  * Uploads a file straight from the browser to S3 using a short-lived
  * presigned URL. The file never passes through our own server/Vercel
  * function, so there's no size limit on our side — S3 itself accepts a
  * single PUT up to 5GB.
+ *
+ * `onProgress` (0-100) fires during the actual network transfer; while the
+ * file is still being compressed beforehand, it stays at 0.
  */
-export async function uploadImageToS3(rawFile: File): Promise<string> {
+export async function uploadImageToS3(rawFile: File, onProgress?: (percent: number) => void): Promise<string> {
   const isVideo = rawFile.type.startsWith("video/");
   const file = isVideo ? rawFile : await resizeImageIfNeeded(rawFile);
 
@@ -114,15 +140,7 @@ export async function uploadImageToS3(rawFile: File): Promise<string> {
     throw new Error(presignData.error ?? "Yuklashda xatolik");
   }
 
-  const putRes = await fetch(presignData.uploadUrl, {
-    method: "PUT",
-    headers: { "Content-Type": file.type },
-    body: file,
-  });
-
-  if (!putRes.ok) {
-    throw new Error("Rasmni saqlab bo'lmadi, qayta urinib ko'ring");
-  }
+  await putWithProgress(presignData.uploadUrl, file, onProgress);
 
   return presignData.publicUrl;
 }
