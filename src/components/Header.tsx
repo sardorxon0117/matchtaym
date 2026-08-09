@@ -9,6 +9,7 @@ import { CATEGORY_SEED } from "@/lib/utils";
 
 const NAV_LINKS = [
   { href: "/", label: "Bosh sahifa" },
+  { href: "/oyinlar", label: "O'yinlar" },
   ...CATEGORY_SEED.map((c) => ({
     href: `/kategoriya/${c.slug}`,
     label: c.name,

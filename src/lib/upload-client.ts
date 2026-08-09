@@ -1,4 +1,4 @@
-const MAX_IMAGE_SIZE = 8 * 1024 * 1024; // 8MB — keep in sync with lib/s3.ts
+const MAX_IMAGE_SIZE = 30 * 1024 * 1024; // 30MB — keep in sync with lib/s3.ts
 
 /**
  * Uploads a file straight from the browser to S3 using a short-lived
@@ -7,7 +7,7 @@ const MAX_IMAGE_SIZE = 8 * 1024 * 1024; // 8MB — keep in sync with lib/s3.ts
  */
 export async function uploadImageToS3(file: File): Promise<string> {
   if (file.size > MAX_IMAGE_SIZE) {
-    throw new Error("Fayl hajmi 8MB dan oshmasligi kerak");
+    throw new Error("Fayl hajmi 30MB dan oshmasligi kerak");
   }
 
   const presignRes = await fetch("/api/upload", {
