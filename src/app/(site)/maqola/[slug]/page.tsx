@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { getArticleBySlug, getRelatedArticles, incrementViews } from "@/lib/queries";
 import { renderMarkdown } from "@/lib/markdown";
@@ -84,9 +83,13 @@ export default async function ArticlePage({
       </div>
 
       {article.coverImage && (
-        <div className="relative mb-8 aspect-[16/9] w-full overflow-hidden rounded-card">
-          <Image src={article.coverImage} alt={article.title} fill priority className="object-cover" sizes="768px" />
-        </div>
+        // Same treatment as in-content images: one fixed width, natural height (no crop).
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={article.coverImage}
+          alt={article.title}
+          className="mx-auto mb-8 block h-auto w-full max-w-[26rem] rounded-card"
+        />
       )}
 
       <div className="prose-article" dangerouslySetInnerHTML={{ __html: html }} />

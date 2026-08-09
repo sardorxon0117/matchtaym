@@ -27,6 +27,7 @@ export default async function EditBannerPage({
           linkUrl: banner.linkUrl,
           startAt: banner.startAt,
           endAt: banner.endAt,
+          isFallback: banner.isFallback,
         }}
       />
     </div>

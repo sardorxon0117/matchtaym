@@ -17,27 +17,26 @@ export default function MatchTile({ match }: { match: FeedMatch }) {
   const status = getMatchStatus(match.dateCount);
 
   return (
-    <div className="rounded-card border border-ink/10 bg-white p-4">
-      <p className="mb-3 text-center text-xs font-medium text-ink-soft/60">
-        {formatMatchDate(match.dateCount)} · {formatMatchClock(match.dateCount)}
-      </p>
+    <div className="flex items-center gap-3 rounded-card border border-ink/10 bg-white p-4">
+      <div className="w-14 shrink-0 text-center">
+        <p className="text-xs font-semibold text-ink">{formatMatchDate(match.dateCount)}</p>
+        <p className="text-xs text-ink-soft">{formatMatchClock(match.dateCount)}</p>
+      </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
+        <span className="truncate text-sm font-medium text-ink">{match.team1name}</span>
         {/* eslint-disable-next-line @next/next/no-img-element -- small external team badges */}
-        <img src={match.team1image} alt="" className="h-8 w-8 shrink-0 rounded-full bg-ink/5 object-contain" />
-        <span className="flex-1 text-sm font-semibold text-ink">{match.team1name}</span>
+        <img src={match.team1image} alt="" className="h-7 w-7 shrink-0 rounded-full bg-ink/5 object-contain" />
       </div>
 
-      <div className="my-2 flex justify-center">
-        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_CLASS[status]}`}>
-          {STATUS_LABEL[status]}
-        </span>
-      </div>
+      <span className={`shrink-0 rounded-full px-2.5 py-1 text-center text-[11px] font-semibold ${STATUS_CLASS[status]}`}>
+        {STATUS_LABEL[status]}
+      </span>
 
-      <div className="flex items-center gap-2">
-        <span className="flex-1 text-right text-sm font-semibold text-ink">{match.team2name}</span>
+      <div className="flex min-w-0 flex-1 items-center gap-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={match.team2image} alt="" className="h-8 w-8 shrink-0 rounded-full bg-ink/5 object-contain" />
+        <img src={match.team2image} alt="" className="h-7 w-7 shrink-0 rounded-full bg-ink/5 object-contain" />
+        <span className="truncate text-sm font-medium text-ink">{match.team2name}</span>
       </div>
     </div>
   );

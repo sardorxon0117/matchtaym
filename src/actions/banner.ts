@@ -23,6 +23,7 @@ const schema = z
 export async function createBanner(formData: FormData) {
   await requireAdmin();
   const parsed = schema.parse(Object.fromEntries(formData));
+  const isFallback = formData.get("isFallback") === "on";
 
   await prisma.banner.create({
     data: {
@@ -31,6 +32,7 @@ export async function createBanner(formData: FormData) {
       linkUrl: parsed.linkUrl,
       startAt: tashkentInputToUtcDate(parsed.startAt),
       endAt: tashkentInputToUtcDate(parsed.endAt),
+      isFallback,
     },
   });
 
@@ -41,6 +43,7 @@ export async function createBanner(formData: FormData) {
 export async function updateBanner(id: string, formData: FormData) {
   await requireAdmin();
   const parsed = schema.parse(Object.fromEntries(formData));
+  const isFallback = formData.get("isFallback") === "on";
 
   await prisma.banner.update({
     where: { id },
@@ -50,11 +53,19 @@ export async function updateBanner(id: string, formData: FormData) {
       linkUrl: parsed.linkUrl,
       startAt: tashkentInputToUtcDate(parsed.startAt),
       endAt: tashkentInputToUtcDate(parsed.endAt),
+      isFallback,
     },
   });
 
   revalidatePath("/", "layout");
   redirect("/admin/banner?saved=1");
+}
+
+export async function toggleBannerEnabled(id: string, next: boolean) {
+  await requireAdmin();
+  await prisma.banner.update({ where: { id }, data: { isEnabled: next } });
+  revalidatePath("/", "layout");
+  revalidatePath("/admin/banner");
 }
 
 export async function deleteBanner(id: string) {

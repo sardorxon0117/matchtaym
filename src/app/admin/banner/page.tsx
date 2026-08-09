@@ -4,12 +4,18 @@ import { getAllBannersForAdmin } from "@/lib/queries";
 import { deleteBanner } from "@/actions/banner";
 import { formatDateTimeUz } from "@/lib/utils";
 import DeleteButton from "@/components/admin/DeleteButton";
+import EnabledToggle from "@/components/admin/EnabledToggle";
 import FlashToast from "@/components/FlashToast";
 
-function status(startAt: Date, endAt: Date): { label: string; className: string } {
+function status(b: { startAt: Date; endAt: Date; isEnabled: boolean; isFallback: boolean }): {
+  label: string;
+  className: string;
+} {
+  if (!b.isEnabled) return { label: "Nofaol (o'chirilgan)", className: "bg-ink/10 text-ink-soft" };
+  if (b.isFallback) return { label: "Standart", className: "bg-blue-100 text-blue-700" };
   const now = new Date();
-  if (now < startAt) return { label: "Rejalashtirilgan", className: "bg-amber-100 text-amber-700" };
-  if (now > endAt) return { label: "Tugagan", className: "bg-ink/10 text-ink-soft" };
+  if (now < b.startAt) return { label: "Rejalashtirilgan", className: "bg-amber-100 text-amber-700" };
+  if (now > b.endAt) return { label: "Tugagan", className: "bg-ink/10 text-ink-soft" };
   return { label: "Faol", className: "bg-green-100 text-green-700" };
 }
 
@@ -25,7 +31,8 @@ export default async function AdminBannerListPage() {
           <h1 className="font-heading text-2xl font-bold text-ink">Reklama bannerlari</h1>
           <p className="mt-1 text-sm text-ink-soft">
             Bir nechta banner qo&apos;shishingiz mumkin — har biri o&apos;z vaqt oralig&apos;ida ko&apos;rinadi. Bir
-            vaqtning o&apos;zida bir nechtasi faol bo&apos;lsa, ular 5 daqiqada almashib turadi.
+            vaqtning o&apos;zida bir nechtasi faol bo&apos;lsa, ular 5 daqiqada almashib turadi. O&apos;ng tomondagi
+            tugma bilan istalgan bannerni istalgan payt yoqib/o&apos;chirib qo&apos;yishingiz mumkin.
           </p>
         </div>
         <Link href="/admin/banner/yangi" className="whitespace-nowrap rounded-pill bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark">
@@ -35,7 +42,7 @@ export default async function AdminBannerListPage() {
 
       <div className="space-y-3">
         {banners.map((b) => {
-          const s = status(b.startAt, b.endAt);
+          const s = status(b);
           return (
             <div key={b.id} className="flex flex-wrap items-center gap-4 rounded-card border border-ink/10 bg-white p-4">
               <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-ink/5">
@@ -48,6 +55,7 @@ export default async function AdminBannerListPage() {
                   {formatDateTimeUz(b.startAt)} — {formatDateTimeUz(b.endAt)}
                 </p>
               </div>
+              <EnabledToggle id={b.id} initialEnabled={b.isEnabled} />
               <div className="flex items-center gap-3">
                 <Link href={`/admin/banner/${b.id}`} className="text-sm font-medium text-primary hover:underline">
                   Tahrirlash

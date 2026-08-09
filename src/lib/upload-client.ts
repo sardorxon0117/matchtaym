@@ -1,10 +1,62 @@
+const MAX_DIMENSION = 1920; // px, longer side
+const JPEG_QUALITY = 0.85;
+const SKIP_RESIZE_UNDER_BYTES = 700 * 1024; // already small enough, don't bother re-encoding
+
+/**
+ * Downscales/re-encodes oversized photos in the browser before upload —
+ * a 12MB camera photo displayed at a few hundred pixels wide was taking
+ * forever to load even on good connections. Falls back to the original
+ * file if anything about this goes wrong (unsupported format, etc.).
+ */
+async function resizeImageIfNeeded(file: File): Promise<File> {
+  if (!file.type.startsWith("image/") || file.type === "image/gif" || file.type === "image/svg+xml") {
+    return file;
+  }
+  if (file.size <= SKIP_RESIZE_UNDER_BYTES) return file;
+
+  try {
+    const bitmap = await createImageBitmap(file);
+    const { width, height } = bitmap;
+    const scale = Math.min(1, MAX_DIMENSION / Math.max(width, height));
+
+    // Small file already, and dimensions are already reasonable — skip.
+    if (scale === 1 && file.size <= 2 * 1024 * 1024) {
+      bitmap.close();
+      return file;
+    }
+
+    const targetW = Math.max(1, Math.round(width * scale));
+    const targetH = Math.max(1, Math.round(height * scale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = targetW;
+    canvas.height = targetH;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      bitmap.close();
+      return file;
+    }
+    ctx.drawImage(bitmap, 0, 0, targetW, targetH);
+    bitmap.close();
+
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", JPEG_QUALITY));
+    if (!blob || blob.size >= file.size) return file; // re-encode didn't help — keep the original
+
+    return new File([blob], file.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" });
+  } catch {
+    return file;
+  }
+}
+
 /**
  * Uploads a file straight from the browser to S3 using a short-lived
  * presigned URL. The file never passes through our own server/Vercel
  * function, so there's no size limit on our side — S3 itself accepts a
  * single PUT up to 5GB.
  */
-export async function uploadImageToS3(file: File): Promise<string> {
+export async function uploadImageToS3(rawFile: File): Promise<string> {
+  const file = await resizeImageIfNeeded(rawFile);
+
   const presignRes = await fetch("/api/upload", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

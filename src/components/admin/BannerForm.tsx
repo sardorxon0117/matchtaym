@@ -15,6 +15,7 @@ export default function BannerForm({
     linkUrl?: string;
     startAt?: Date | string;
     endAt?: Date | string;
+    isFallback?: boolean;
   };
 }) {
   const [mobileImageUrl, setMobileImageUrl] = useState(initial?.mobileImageUrl ?? "");
@@ -32,7 +33,7 @@ export default function BannerForm({
       <div className="rounded-card border border-ink/10 bg-white p-5">
         <ImageUploader name="desktopImageUrl" value={desktopImageUrl} onChange={setDesktopImageUrl} label="Kompyuter/planshet banner (tik panel)" />
         <p className="mt-2 text-xs text-ink-soft/70">
-          Tavsiya: tik (vertikal) rasm. Kompyuter va planshetlarda o&apos;ng tomonda, o&apos;yinlar ostida ko&apos;rinadi.
+          Tavsiya: tik (vertikal) rasm. Kompyuter va planshetlarda o&apos;ng tomonda, o&apos;yinlar ustida ko&apos;rinadi.
         </p>
       </div>
 
@@ -67,6 +68,19 @@ export default function BannerForm({
         Shu vaqt oralig&apos;ida banner saytda ko&apos;rinadi. Bir vaqtning o&apos;zida bir nechta banner faol bo&apos;lsa,
         ular 5 daqiqada bir almashib turadi.
       </p>
+
+      <label className="flex items-start gap-2.5 rounded-card border border-ink/10 bg-white p-4">
+        <input
+          type="checkbox"
+          name="isFallback"
+          defaultChecked={initial?.isFallback}
+          className="mt-0.5 h-4 w-4 accent-primary"
+        />
+        <span className="text-sm text-ink">
+          <span className="font-medium">Standart banner</span> — hech qanday boshqa banner faol bo&apos;lmagan
+          vaqtlarda shu banner ko&apos;rsatiladi (vaqt oralig&apos;idan qat&apos;i nazar).
+        </span>
+      </label>
 
       <button type="submit" className="rounded-pill bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary-dark">
         Saqlash

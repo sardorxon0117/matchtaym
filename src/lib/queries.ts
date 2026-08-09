@@ -188,8 +188,15 @@ export async function getAllTransfersForAdmin() {
 /** Banners whose visibility window currently covers "now". */
 export async function getActiveBanners() {
   const now = new Date();
+  const scheduled = await prisma.banner.findMany({
+    where: { isEnabled: true, isFallback: false, startAt: { lte: now }, endAt: { gte: now } },
+    orderBy: { startAt: "asc" },
+  });
+  if (scheduled.length > 0) return scheduled;
+
+  // Nothing scheduled for right now — show the "always on" fallback banner(s) instead.
   return prisma.banner.findMany({
-    where: { startAt: { lte: now }, endAt: { gte: now } },
+    where: { isEnabled: true, isFallback: true },
     orderBy: { startAt: "asc" },
   });
 }

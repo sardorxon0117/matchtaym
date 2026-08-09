@@ -32,7 +32,16 @@ export default function HeroPromoBox({ matches, banners }: { matches: FeedMatch[
       }
       className={`overflow-hidden rounded-card border border-ink/10 bg-white ${activeBanner ? "cursor-pointer" : ""}`}
     >
-      <div className="p-4">
+      {activeBanner && (
+        <div key={activeBanner.id} className="ad-fade relative h-40 w-full">
+          <Image src={activeBanner.desktopImageUrl} alt="Reklama" fill className="object-cover" sizes="300px" />
+          <span className="absolute bottom-2 right-2 rounded bg-ink/60 px-1.5 py-0.5 text-[10px] text-white">
+            Reklama
+          </span>
+        </div>
+      )}
+
+      <div className={`p-4 ${activeBanner ? "border-t border-ink/5" : ""}`}>
         <h3 className="mb-1 font-heading text-base font-bold text-ink">O&apos;yinlar</h3>
 
         {matches.length > 0 ? (
@@ -56,15 +65,6 @@ export default function HeroPromoBox({ matches, banners }: { matches: FeedMatch[
           Boshqa o&apos;yinlar →
         </button>
       </div>
-
-      {activeBanner && (
-        <div key={activeBanner.id} className="ad-fade relative h-40 w-full border-t border-ink/5">
-          <Image src={activeBanner.desktopImageUrl} alt="Reklama" fill className="object-cover" sizes="300px" />
-          <span className="absolute bottom-2 right-2 rounded bg-ink/60 px-1.5 py-0.5 text-[10px] text-white">
-            Reklama
-          </span>
-        </div>
-      )}
     </div>
   );
 }

@@ -188,6 +188,11 @@ model Banner {
   linkUrl         String
   startAt         DateTime
   endAt           DateTime
+  // Manual on/off switch, independent of the time window.
+  isEnabled       Boolean  @default(true)
+  // Shown instead, whenever no regular (isFallback: false) banner is
+  // currently active/enabled — a "nothing else to show" default.
+  isFallback      Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
