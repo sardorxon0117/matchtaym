@@ -30,13 +30,13 @@ export default function EnabledToggle({ id, initialEnabled }: { id: string; init
       disabled={pending}
       aria-pressed={enabled}
       aria-label={enabled ? "Bannerni o'chirish" : "Bannerni yoqish"}
-      className={`relative h-6 w-11 shrink-0 rounded-pill transition-colors disabled:opacity-60 ${
+      className={`inline-flex h-6 w-11 shrink-0 items-center rounded-pill p-0.5 transition-colors disabled:opacity-60 ${
         enabled ? "bg-primary" : "bg-ink/15"
       }`}
     >
       <span
-        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-          enabled ? "translate-x-[1.375rem]" : "translate-x-0.5"
+        className={`h-5 w-5 rounded-full bg-white shadow transition-transform ${
+          enabled ? "translate-x-5" : "translate-x-0"
         }`}
       />
     </button>

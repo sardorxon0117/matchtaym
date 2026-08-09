@@ -46,6 +46,7 @@ export default function UserMenu({
   }
 
   const initial = user.name?.[0]?.toUpperCase() ?? "?";
+  const isStaff = STAFF_ROLES.has(user.role);
 
   return (
     <div className="relative" ref={ref}>
@@ -55,6 +56,10 @@ export default function UserMenu({
       >
         {user.image ? (
           <Image src={user.image} alt="" width={28} height={28} className="rounded-full" />
+        ) : isStaff ? (
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary p-1">
+            <Image src="/logo-mark.svg" alt="" width={20} height={20} className="h-full w-full brightness-0 invert" />
+          </span>
         ) : (
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
             {initial}
