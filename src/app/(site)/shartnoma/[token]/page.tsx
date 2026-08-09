@@ -7,7 +7,7 @@ import { formatDateTimeUz } from "@/lib/utils";
 import ContractDocument from "@/components/ContractDocument";
 import ContractSignForm from "@/components/ContractSignForm";
 import ContractPaymentForm from "@/components/ContractPaymentForm";
-import PrintContractButton from "@/components/PrintContractButton";
+import ContractPdfButton from "@/components/ContractPdfButton";
 import CopyLinkButton from "@/components/CopyLinkButton";
 
 export const metadata: Metadata = { title: "Reklama shartnomasi" };
@@ -36,7 +36,7 @@ export default async function ContractSignPage({
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-heading text-2xl font-bold text-ink sm:text-3xl">Reklama shartnomasi</h1>
-        <PrintContractButton />
+        <ContractPdfButton contract={contract} />
       </div>
 
       {xato && (

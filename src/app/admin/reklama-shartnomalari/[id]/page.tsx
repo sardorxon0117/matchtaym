@@ -6,7 +6,7 @@ import ContractDocument from "@/components/ContractDocument";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import ConfirmPaymentButton from "@/components/admin/ConfirmPaymentButton";
 import RejectPaymentForm from "@/components/admin/RejectPaymentForm";
-import PrintContractButton from "@/components/PrintContractButton";
+import ContractPdfButton from "@/components/ContractPdfButton";
 
 export default async function AdContractDetailPage({
   params,
@@ -45,7 +45,7 @@ export default async function AdContractDetailPage({
           <span className={`rounded-full px-3 py-1 text-sm font-medium ${AD_CONTRACT_STATUS_BADGE[contract.status]}`}>
             {AD_CONTRACT_STATUS_LABELS[contract.status]}
           </span>
-          <PrintContractButton />
+          <ContractPdfButton contract={contract} />
         </div>
       </div>
 

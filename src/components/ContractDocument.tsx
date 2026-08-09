@@ -9,12 +9,40 @@ export type ContractDocumentData = {
   startAt: Date | string | null;
   endAt: Date | string | null;
   totalAmountUzs: number | null;
+  status: string;
   agreedAt: Date | string | null;
   agreedIp: string | null;
+  paymentConfirmedAt: Date | string | null;
   createdAt: Date | string;
 };
 
 const BLANK = "________________";
+
+function PaymentStatusLine({ contract }: { contract: ContractDocumentData }) {
+  if (contract.status === "CONFIRMED" && contract.totalAmountUzs !== null) {
+    return (
+      <p className="mt-4 rounded-card border border-green-200 bg-green-50 px-4 py-2.5 font-sans text-sm font-semibold text-green-700">
+        ✅ To&apos;lov: {formatUzs(contract.totalAmountUzs)} —{" "}
+        {contract.paymentConfirmedAt ? formatDateTimeUz(contract.paymentConfirmedAt) : ""} sanada tasdiqlandi.
+      </p>
+    );
+  }
+  if (contract.status === "PAYMENT_SUBMITTED") {
+    return (
+      <p className="mt-4 rounded-card border border-amber-200 bg-amber-50 px-4 py-2.5 font-sans text-sm font-semibold text-amber-700">
+        ⏳ To&apos;lov cheki yuklandi, tasdiqlanishi kutilmoqda.
+      </p>
+    );
+  }
+  if (contract.status === "AWAITING_PAYMENT" || contract.status === "REJECTED") {
+    return (
+      <p className="mt-4 rounded-card border border-ink/10 bg-cream px-4 py-2.5 font-sans text-sm font-medium text-ink-soft">
+        To&apos;lov hali amalga oshirilmagan.
+      </p>
+    );
+  }
+  return null;
+}
 
 /**
  * Renders the ad-placement contract as a formal, A4-styled document — used
@@ -90,6 +118,8 @@ export default function ContractDocument({ contract }: { contract: ContractDocum
           deb tan olishadi.
         </li>
       </ol>
+
+      <PaymentStatusLine contract={contract} />
 
       <div className="mt-8 grid gap-6 border-t border-ink/10 pt-6 sm:grid-cols-2">
         <div>
