@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ImageUploader from "./ImageUploader";
+import MediaUploader from "./MediaUploader";
 import { dateToTashkentInputValue } from "@/lib/utils";
 
 export default function BannerForm({
@@ -24,16 +24,19 @@ export default function BannerForm({
   return (
     <form action={action} className="max-w-md space-y-5">
       <div className="rounded-card border border-ink/10 bg-white p-5">
-        <ImageUploader name="mobileImageUrl" value={mobileImageUrl} onChange={setMobileImageUrl} label="Mobil banner (keng, past chiziq)" />
+        <MediaUploader name="mobileImageUrl" value={mobileImageUrl} onChange={setMobileImageUrl} label="Mobil banner — rasm yoki video" />
         <p className="mt-2 text-xs text-ink-soft/70">
-          Tavsiya: keng va past rasm (masalan 1200×300). Telefonlarda header ostida ko&apos;rinadi.
+          Joy nisbati doim 5:1 (keng, past chiziq) — rasm/video shu ichiga <b>butunligicha</b> sig&apos;adi
+          (kesilmaydi). Telefonlarda header ostida ko&apos;rinadi. Video bo&apos;lsa avtomatik, tugmasiz,
+          tinch (ovozsiz) va uzluksiz aylanib turadi.
         </p>
       </div>
 
       <div className="rounded-card border border-ink/10 bg-white p-5">
-        <ImageUploader name="desktopImageUrl" value={desktopImageUrl} onChange={setDesktopImageUrl} label="Kompyuter/planshet banner (tik panel)" />
+        <MediaUploader name="desktopImageUrl" value={desktopImageUrl} onChange={setDesktopImageUrl} label="Kompyuter/planshet banner — rasm yoki video" />
         <p className="mt-2 text-xs text-ink-soft/70">
-          Tavsiya: tik (vertikal) rasm. Kompyuter va planshetlarda o&apos;ng tomonda, o&apos;yinlar ustida ko&apos;rinadi.
+          Joy nisbati doim 3:2 — rasm/video shu ichiga <b>butunligicha</b> sig&apos;adi (kesilmaydi). Kompyuter va
+          planshetlarda o&apos;ng tomonda, o&apos;yinlar ustida ko&apos;rinadi.
         </p>
       </div>
 

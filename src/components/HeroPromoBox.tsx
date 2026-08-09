@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Banner } from "@/generated/prisma/client";
 import type { FeedMatch } from "@/lib/match-format";
 import { useRotatingIndex } from "@/lib/useRotatingIndex";
+import { isVideoUrl } from "@/lib/media";
 import MatchRow from "./MatchRow";
 
 const ROTATE_MS = 5 * 60 * 1000;
@@ -33,8 +34,21 @@ export default function HeroPromoBox({ matches, banners }: { matches: FeedMatch[
       className={`overflow-hidden rounded-card border border-ink/10 bg-white ${activeBanner ? "cursor-pointer" : ""}`}
     >
       {activeBanner && (
-        <div key={activeBanner.id} className="ad-fade relative h-56 w-full">
-          <Image src={activeBanner.desktopImageUrl} alt="Reklama" fill className="object-cover" sizes="340px" />
+        // Fixed 3:2 slot regardless of image or video — content fits inside via
+        // "contain" (never cropped), so the advertiser's whole creative stays visible.
+        <div key={activeBanner.id} className="ad-fade relative aspect-[3/2] w-full bg-ink/5">
+          {isVideoUrl(activeBanner.desktopImageUrl) ? (
+            <video
+              src={activeBanner.desktopImageUrl}
+              className="h-full w-full object-contain"
+              autoPlay
+              loop
+              muted
+              playsInline
+            />
+          ) : (
+            <Image src={activeBanner.desktopImageUrl} alt="Reklama" fill className="object-contain" sizes="340px" />
+          )}
           <span className="absolute bottom-2 right-2 rounded bg-ink/60 px-1.5 py-0.5 text-[10px] text-white">
             Reklama
           </span>

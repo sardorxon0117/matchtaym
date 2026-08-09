@@ -6,7 +6,22 @@ const bucket = process.env.AWS_S3_BUCKET!;
 
 export const s3 = new S3Client({ region });
 
-const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"]);
+const ALLOWED_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/gif",
+  // Video — used for the ad banner slot, which accepts either an image or a
+  // short looping clip.
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+]);
+
+const EXT_OVERRIDES: Record<string, string> = {
+  "video/quicktime": "mov",
+};
 
 export function publicUrlFor(key: string): string {
   return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
@@ -28,10 +43,10 @@ export async function createPresignedUpload(
   folder = "uploads/articles"
 ): Promise<{ uploadUrl: string; publicUrl: string }> {
   if (!ALLOWED_TYPES.has(contentType)) {
-    throw new Error("Faqat rasm fayllari qabul qilinadi (jpg, png, webp, avif, gif)");
+    throw new Error("Faqat rasm (jpg, png, webp, avif, gif) yoki video (mp4, webm, mov) fayllari qabul qilinadi");
   }
 
-  const ext = contentType.split("/")[1];
+  const ext = EXT_OVERRIDES[contentType] ?? contentType.split("/")[1];
   const key = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${ext}`;
 
   const uploadUrl = await getSignedUrl(

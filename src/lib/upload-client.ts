@@ -5,7 +5,10 @@ const SKIP_RESIZE_UNDER_BYTES = 700 * 1024; // already small enough, don't bothe
 // couldn't compress (e.g. resize failed) would otherwise upload fine but
 // then fail to render in real browsers — better to reject it up front than
 // ship a "disappearing" image.
-const HARD_MAX_BYTES = 15 * 1024 * 1024;
+const HARD_MAX_IMAGE_BYTES = 15 * 1024 * 1024;
+// Video isn't re-encoded client-side (too heavy for a browser to do
+// reliably), so it gets a bigger — but still bounded — ceiling.
+const HARD_MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
 function getImageDimensions(file: File): Promise<{ width: number; height: number } | null> {
   return new Promise((resolve) => {
@@ -84,11 +87,13 @@ async function resizeImageIfNeeded(file: File): Promise<File> {
  * single PUT up to 5GB.
  */
 export async function uploadImageToS3(rawFile: File): Promise<string> {
-  const file = await resizeImageIfNeeded(rawFile);
+  const isVideo = rawFile.type.startsWith("video/");
+  const file = isVideo ? rawFile : await resizeImageIfNeeded(rawFile);
 
-  if (file.size > HARD_MAX_BYTES) {
+  const ceiling = isVideo ? HARD_MAX_VIDEO_BYTES : HARD_MAX_IMAGE_BYTES;
+  if (file.size > ceiling) {
     throw new Error(
-      `Rasmni siqib bo'lmadi va u hali ham juda katta (${(file.size / 1024 / 1024).toFixed(1)}MB). Boshqa yoki kichikroq rasm tanlab ko'ring.`
+      `Fayl hajmi juda katta (${(file.size / 1024 / 1024).toFixed(1)}MB). Maksimal: ${(ceiling / 1024 / 1024).toFixed(0)}MB.`
     );
   }
 
