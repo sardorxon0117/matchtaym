@@ -26,7 +26,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="flex min-h-screen bg-cream">
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-ink/10 bg-white md:flex">
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-ink/10 bg-white md:flex print:hidden">
         <div className="border-b border-ink/10 px-5 py-5">
           <span className="font-heading text-lg font-bold text-ink">
             Match<span className="text-primary">Taym</span>{" "}
@@ -56,7 +56,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </aside>
 
       <div className="flex-1">
-        <header className="flex items-center justify-between border-b border-ink/10 bg-white px-4 py-3 md:hidden">
+        <header className="flex items-center justify-between border-b border-ink/10 bg-white px-4 py-3 md:hidden print:hidden">
           <span className="font-heading text-lg font-bold text-ink">
             Match<span className="text-primary">Taym</span>
           </span>
@@ -64,7 +64,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <button className="text-sm font-medium text-ink-soft">Chiqish</button>
           </form>
         </header>
-        <nav className="flex gap-1 overflow-x-auto border-b border-ink/10 bg-white px-3 py-2 md:hidden">
+        <nav className="flex gap-1 overflow-x-auto border-b border-ink/10 bg-white px-3 py-2 md:hidden print:hidden">
           {NAV.map((item) => (
             <Link
               key={item.href}

@@ -7,6 +7,8 @@ import { formatDateTimeUz } from "@/lib/utils";
 import ContractDocument from "@/components/ContractDocument";
 import ContractSignForm from "@/components/ContractSignForm";
 import ContractPaymentForm from "@/components/ContractPaymentForm";
+import PrintContractButton from "@/components/PrintContractButton";
+import CopyLinkButton from "@/components/CopyLinkButton";
 
 export const metadata: Metadata = { title: "Reklama shartnomasi" };
 
@@ -32,7 +34,10 @@ export default async function ContractSignPage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="mb-6 font-heading text-2xl font-bold text-ink sm:text-3xl">Reklama shartnomasi</h1>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-heading text-2xl font-bold text-ink sm:text-3xl">Reklama shartnomasi</h1>
+        <PrintContractButton />
+      </div>
 
       {xato && (
         <p className="mb-4 rounded-card border border-red-200 bg-red-50 p-3 text-sm text-red-700">
@@ -88,9 +93,12 @@ export default async function ContractSignPage({
             </p>
             {settings?.cardNumber ? (
               <>
-                <p className="mb-1 text-sm text-ink-soft">
-                  Karta raqami: <span className="font-mono font-semibold text-ink">{settings.cardNumber}</span>
-                </p>
+                <div className="mb-1 flex flex-wrap items-center gap-2 text-sm text-ink-soft">
+                  <span>
+                    Karta raqami: <span className="font-mono font-semibold text-ink">{settings.cardNumber}</span>
+                  </span>
+                  <CopyLinkButton text={settings.cardNumber} label="Nusxalash" />
+                </div>
                 <p className="text-sm text-ink-soft">
                   Karta egasi: <span className="font-semibold text-ink">{settings.cardHolderName}</span>
                 </p>

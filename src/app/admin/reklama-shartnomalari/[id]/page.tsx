@@ -3,9 +3,10 @@ import Link from "next/link";
 import { getAdContractById } from "@/lib/queries";
 import { AD_CONTRACT_STATUS_LABELS, AD_CONTRACT_STATUS_BADGE } from "@/lib/contract-format";
 import ContractDocument from "@/components/ContractDocument";
-import CopyLinkButton from "@/components/admin/CopyLinkButton";
+import CopyLinkButton from "@/components/CopyLinkButton";
 import ConfirmPaymentButton from "@/components/admin/ConfirmPaymentButton";
 import RejectPaymentForm from "@/components/admin/RejectPaymentForm";
+import PrintContractButton from "@/components/PrintContractButton";
 
 export default async function AdContractDetailPage({
   params,
@@ -40,9 +41,12 @@ export default async function AdContractDetailPage({
 
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-heading text-2xl font-bold text-ink">Shartnoma</h1>
-        <span className={`rounded-full px-3 py-1 text-sm font-medium ${AD_CONTRACT_STATUS_BADGE[contract.status]}`}>
-          {AD_CONTRACT_STATUS_LABELS[contract.status]}
-        </span>
+        <div className="flex items-center gap-3">
+          <span className={`rounded-full px-3 py-1 text-sm font-medium ${AD_CONTRACT_STATUS_BADGE[contract.status]}`}>
+            {AD_CONTRACT_STATUS_LABELS[contract.status]}
+          </span>
+          <PrintContractButton />
+        </div>
       </div>
 
       {!created && (

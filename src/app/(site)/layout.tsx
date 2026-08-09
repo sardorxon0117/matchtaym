@@ -26,19 +26,23 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 
   return (
     <>
-      <Header user={user} />
-      <MobileAdBanner banners={banners} />
+      <div className="print:hidden">
+        <Header user={user} />
+        <MobileAdBanner banners={banners} />
+      </div>
 
       <div className="mx-auto flex w-full max-w-[90rem] items-start gap-6 px-0 md:px-6">
         <div className="min-w-0 flex-1">{children}</div>
-        <aside className="sticky top-20 hidden w-[340px] shrink-0 py-8 md:block">
+        <aside className="sticky top-20 hidden w-[340px] shrink-0 py-8 md:block print:hidden">
           <Suspense fallback={<PromoBoxSkeleton />}>
             <PromoBoxServer banners={banners} />
           </Suspense>
         </aside>
       </div>
 
-      <Footer />
+      <div className="print:hidden">
+        <Footer />
+      </div>
     </>
   );
 }

@@ -3,7 +3,7 @@ import { getAdContracts, getAdContractSettings } from "@/lib/queries";
 import { AD_CONTRACT_STATUS_LABELS, AD_CONTRACT_STATUS_BADGE, formatUzs } from "@/lib/contract-format";
 import { formatDateTimeUz } from "@/lib/utils";
 import DeleteButton from "@/components/admin/DeleteButton";
-import CopyLinkButton from "@/components/admin/CopyLinkButton";
+import CopyLinkButton from "@/components/CopyLinkButton";
 import ContractCalendar from "@/components/admin/ContractCalendar";
 import ContractSettingsForm from "@/components/admin/ContractSettingsForm";
 import { deleteAdContract } from "@/actions/ad-contract";
