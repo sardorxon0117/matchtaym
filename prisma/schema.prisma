@@ -176,15 +176,21 @@ model Transfer {
   @@map("transfers")
 }
 
-// Single-row site-wide ad banner, managed from the admin panel.
-// Mobile and desktop use separate images since their slots have very
-// different aspect ratios (a thin strip vs. a tall sidebar panel).
+// Site-wide ad banners, managed from the admin panel. Each banner has its
+// own visibility window (startAt..endAt, to the minute); whichever banners
+// are currently within their window are shown, rotating every 5 minutes if
+// more than one overlaps. Mobile and desktop use separate images since their
+// slots have very different aspect ratios (a thin strip vs. a tall panel).
 model Banner {
   id              String   @id @default(cuid())
   mobileImageUrl  String
   desktopImageUrl String
   linkUrl         String
+  startAt         DateTime
+  endAt           DateTime
+  createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
+  @@index([startAt, endAt])
   @@map("banner")
 }

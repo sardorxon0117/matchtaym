@@ -15,6 +15,7 @@ const articleCard = {
   views: true,
   category: { select: { name: true, slug: true } },
   author: { select: { name: true } },
+  _count: { select: { comments: true } },
 } satisfies Prisma.ArticleSelect;
 
 export async function getFeed(page = 1) {
@@ -184,8 +185,21 @@ export async function getAllTransfersForAdmin() {
   });
 }
 
-export async function getBanner() {
-  return prisma.banner.findFirst({ orderBy: { updatedAt: "desc" } });
+/** Banners whose visibility window currently covers "now". */
+export async function getActiveBanners() {
+  const now = new Date();
+  return prisma.banner.findMany({
+    where: { startAt: { lte: now }, endAt: { gte: now } },
+    orderBy: { startAt: "asc" },
+  });
+}
+
+export async function getAllBannersForAdmin() {
+  return prisma.banner.findMany({ orderBy: { startAt: "desc" } });
+}
+
+export async function getBannerForEdit(id: string) {
+  return prisma.banner.findUnique({ where: { id } });
 }
 
 export async function getCommentsForArticle(articleId: string) {

@@ -1,5 +1,5 @@
-import type { FeedMatch } from "@/lib/matches";
-import { formatMatchTime } from "@/lib/matches";
+import type { FeedMatch } from "@/lib/match-format";
+import { formatMatchTime } from "@/lib/match-format";
 
 export default function MatchRow({ match }: { match: FeedMatch }) {
   return (

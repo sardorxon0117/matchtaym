@@ -1,15 +1,10 @@
-const MAX_IMAGE_SIZE = 30 * 1024 * 1024; // 30MB — keep in sync with lib/s3.ts
-
 /**
  * Uploads a file straight from the browser to S3 using a short-lived
  * presigned URL. The file never passes through our own server/Vercel
- * function, so there's no request-body size limit to hit.
+ * function, so there's no size limit on our side — S3 itself accepts a
+ * single PUT up to 5GB.
  */
 export async function uploadImageToS3(file: File): Promise<string> {
-  if (file.size > MAX_IMAGE_SIZE) {
-    throw new Error("Fayl hajmi 30MB dan oshmasligi kerak");
-  }
-
   const presignRes = await fetch("/api/upload", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

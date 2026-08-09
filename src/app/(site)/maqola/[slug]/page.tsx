@@ -80,8 +80,6 @@ export default async function ArticlePage({
         <span>•</span>
         <span>{article.publishedAt ? formatDateUz(article.publishedAt) : ""}</span>
         <span>•</span>
-        <span>{article.readTimeMin} daqiqa o&apos;qish</span>
-        <span>•</span>
         <span>{article.views + 1} ko&apos;rish</span>
       </div>
 

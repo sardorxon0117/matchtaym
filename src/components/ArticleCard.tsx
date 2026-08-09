@@ -8,8 +8,9 @@ export type ArticleCardData = {
   excerpt: string | null;
   coverImage: string | null;
   publishedAt: Date | string | null;
-  readTimeMin: number;
+  views: number;
   category: { name: string; slug: string } | null;
+  _count?: { comments: number };
 };
 
 export default function ArticleCard({ article }: { article: ArticleCardData }) {
@@ -43,12 +44,33 @@ export default function ArticleCard({ article }: { article: ArticleCardData }) {
         {article.excerpt && (
           <p className="mb-3 line-clamp-2 flex-1 text-sm text-ink-soft">{article.excerpt}</p>
         )}
-        <div className="mt-auto flex items-center gap-2 text-xs text-ink-soft/70">
+        <div className="mt-auto flex items-center gap-3 text-xs text-ink-soft/70">
           {article.publishedAt && <span>{formatRelativeUz(article.publishedAt)}</span>}
-          <span>•</span>
-          <span>{article.readTimeMin} daqiqa</span>
+          <span className="flex items-center gap-1">
+            <EyeIcon /> {article.views}
+          </span>
+          <span className="flex items-center gap-1">
+            <CommentIcon /> {article._count?.comments ?? 0}
+          </span>
         </div>
       </div>
     </Link>
+  );
+}
+
+function EyeIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function CommentIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
   );
 }

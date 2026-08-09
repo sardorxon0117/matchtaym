@@ -91,8 +91,12 @@ h4,
   margin: 1.2em 0;
 }
 .prose-article img {
+  display: block;
+  width: 100%;
+  max-width: 26rem;
+  height: auto;
+  margin: 1.5em auto;
   border-radius: var(--radius-card);
-  margin: 1.2em 0;
 }
 .prose-article ul,
 .prose-article ol {
@@ -106,4 +110,16 @@ h4,
 }
 .prose-article strong {
   font-weight: 700;
+}
+
+@keyframes ad-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.ad-fade {
+  animation: ad-fade 0.7s ease;
 }

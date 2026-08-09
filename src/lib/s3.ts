@@ -7,7 +7,6 @@ const bucket = process.env.AWS_S3_BUCKET!;
 export const s3 = new S3Client({ region });
 
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"]);
-export const MAX_IMAGE_SIZE = 30 * 1024 * 1024; // 30MB — uploads go straight to S3, no server body limit
 
 export function publicUrlFor(key: string): string {
   return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
@@ -43,7 +42,7 @@ export async function createPresignedUpload(
       ContentType: contentType,
       CacheControl: "public, max-age=31536000, immutable",
     }),
-    { expiresIn: 60 }
+    { expiresIn: 900 } // 15 min — generous for large uploads on a slow connection
   );
 
   return { uploadUrl, publicUrl: publicUrlFor(key) };

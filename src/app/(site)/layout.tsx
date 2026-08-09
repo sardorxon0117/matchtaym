@@ -1,13 +1,14 @@
 import { auth } from "@/auth";
-import { getBanner } from "@/lib/queries";
+import { getActiveBanners } from "@/lib/queries";
+import { getFeedMatches } from "@/lib/matches";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { MobileAdBanner, DesktopAdBanner } from "@/components/AdBanner";
-import TodayMatchesWidget from "@/components/TodayMatchesWidget";
+import MobileAdBanner from "@/components/MobileAdBanner";
+import HeroPromoBox from "@/components/HeroPromoBox";
 import type { HeaderUser } from "@/components/UserMenu";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [session, banner] = await Promise.all([auth(), getBanner()]);
+  const [session, banners, matches] = await Promise.all([auth(), getActiveBanners(), getFeedMatches()]);
 
   const user: HeaderUser | null = session?.user
     ? {
@@ -22,13 +23,12 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   return (
     <>
       <Header user={user} />
-      <MobileAdBanner banner={banner} />
+      <MobileAdBanner banners={banners} />
 
       <div className="mx-auto flex w-full max-w-[88rem] items-start gap-6 px-0 md:px-6">
         <div className="min-w-0 flex-1">{children}</div>
-        <aside className="sticky top-20 hidden w-[300px] shrink-0 space-y-4 py-8 md:block">
-          <DesktopAdBanner banner={banner} />
-          <TodayMatchesWidget />
+        <aside className="sticky top-20 hidden w-[300px] shrink-0 py-8 md:block">
+          <HeroPromoBox matches={matches} banners={banners} />
         </aside>
       </div>
 

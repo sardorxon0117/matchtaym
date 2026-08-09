@@ -30,6 +30,21 @@ export function formatDateUz(date: Date | string): string {
   return `${d.getDate()} ${MONTHS_UZ[d.getMonth()]}, ${d.getFullYear()}`;
 }
 
+/** Date + time (Toshkent), for admin displays where the exact minute matters. */
+export function formatDateTimeUz(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Tashkent",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(d);
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  return `${Number(get("day"))} ${MONTHS_UZ[Number(get("month")) - 1]}, ${get("hour")}:${get("minute")}`;
+}
+
 export function formatRelativeUz(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
   const diffMs = Date.now() - d.getTime();
@@ -41,6 +56,36 @@ export function formatRelativeUz(date: Date | string): string {
   const diffDay = Math.floor(diffHour / 24);
   if (diffDay < 7) return `${diffDay} kun oldin`;
   return formatDateUz(d);
+}
+
+/**
+ * Converts a `datetime-local` input value ("YYYY-MM-DDTHH:mm"), entered by
+ * the admin as Tashkent wall-clock time, into the correct UTC instant.
+ * Tashkent is a fixed UTC+5 with no DST, so a plain offset subtraction is
+ * exact — this avoids the server (which runs in UTC on Vercel) silently
+ * misinterpreting the string as its own local time.
+ */
+export function tashkentInputToUtcDate(value: string): Date {
+  const [datePart, timePart] = value.split("T");
+  const [y, mo, d] = datePart.split("-").map(Number);
+  const [h, mi] = (timePart ?? "00:00").split(":").map(Number);
+  return new Date(Date.UTC(y, mo - 1, d, h - 5, mi));
+}
+
+/** Inverse of `tashkentInputToUtcDate` — formats a UTC Date back into Tashkent wall-clock for form inputs. */
+export function dateToTashkentInputValue(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Tashkent",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(d);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "00";
+  return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
 }
 
 export const CATEGORY_SEED = [
