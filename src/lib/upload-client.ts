@@ -1,6 +1,27 @@
 const MAX_DIMENSION = 1920; // px, longer side
 const JPEG_QUALITY = 0.85;
 const SKIP_RESIZE_UNDER_BYTES = 700 * 1024; // already small enough, don't bother re-encoding
+// Absolute ceiling for whatever ends up going to S3. A huge original that we
+// couldn't compress (e.g. resize failed) would otherwise upload fine but
+// then fail to render in real browsers — better to reject it up front than
+// ship a "disappearing" image.
+const HARD_MAX_BYTES = 15 * 1024 * 1024;
+
+function getImageDimensions(file: File): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const img = new window.Image();
+    img.onload = () => {
+      resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      URL.revokeObjectURL(url);
+    };
+    img.onerror = () => {
+      resolve(null);
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  });
+}
 
 /**
  * Downscales/re-encodes oversized photos in the browser before upload —
@@ -15,18 +36,25 @@ async function resizeImageIfNeeded(file: File): Promise<File> {
   if (file.size <= SKIP_RESIZE_UNDER_BYTES) return file;
 
   try {
-    const bitmap = await createImageBitmap(file);
-    const { width, height } = bitmap;
-    const scale = Math.min(1, MAX_DIMENSION / Math.max(width, height));
+    const dims = await getImageDimensions(file);
+    if (!dims) return file;
 
-    // Small file already, and dimensions are already reasonable — skip.
-    if (scale === 1 && file.size <= 2 * 1024 * 1024) {
-      bitmap.close();
-      return file;
-    }
+    const scale = Math.min(1, MAX_DIMENSION / Math.max(dims.width, dims.height));
 
-    const targetW = Math.max(1, Math.round(width * scale));
-    const targetH = Math.max(1, Math.round(height * scale));
+    // Small dimensions already, and file isn't huge — skip re-encoding.
+    if (scale === 1 && file.size <= 2 * 1024 * 1024) return file;
+
+    const targetW = Math.max(1, Math.round(dims.width * scale));
+    const targetH = Math.max(1, Math.round(dims.height * scale));
+
+    // Ask the browser to decode directly at the target resolution — a full-res
+    // decode of a huge photo (tens of megapixels) can exhaust memory on phones
+    // and silently fail, which is exactly what was shipping 40MB+ originals.
+    const bitmap = await createImageBitmap(file, {
+      resizeWidth: targetW,
+      resizeHeight: targetH,
+      resizeQuality: "high",
+    });
 
     const canvas = document.createElement("canvas");
     canvas.width = targetW;
@@ -43,7 +71,8 @@ async function resizeImageIfNeeded(file: File): Promise<File> {
     if (!blob || blob.size >= file.size) return file; // re-encode didn't help — keep the original
 
     return new File([blob], file.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" });
-  } catch {
+  } catch (err) {
+    console.error("Image resize failed, falling back to original:", err);
     return file;
   }
 }
@@ -56,6 +85,12 @@ async function resizeImageIfNeeded(file: File): Promise<File> {
  */
 export async function uploadImageToS3(rawFile: File): Promise<string> {
   const file = await resizeImageIfNeeded(rawFile);
+
+  if (file.size > HARD_MAX_BYTES) {
+    throw new Error(
+      `Rasmni siqib bo'lmadi va u hali ham juda katta (${(file.size / 1024 / 1024).toFixed(1)}MB). Boshqa yoki kichikroq rasm tanlab ko'ring.`
+    );
+  }
 
   const presignRes = await fetch("/api/upload", {
     method: "POST",
