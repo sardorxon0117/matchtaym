@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import BurstBallIcon from "@/components/BurstBallIcon";
 
 // Root-level not-found — catches both genuinely unmatched URLs and any
 // explicit notFound() call from a page (article/category/etc.) that
@@ -11,9 +12,7 @@ export default function NotFound() {
       <div className="mb-8">
         <Logo />
       </div>
-      <div className="mb-6 animate-bounce text-8xl" aria-hidden="true">
-        ⚽
-      </div>
+      <BurstBallIcon className="wobble mb-6 h-32 w-32" />
       <p className="mb-1 font-heading text-lg font-semibold text-primary">404</p>
       <h1 className="mb-2 font-heading text-2xl font-bold text-ink sm:text-3xl">Sahifa topilmadi</h1>
       <p className="mb-8 max-w-sm text-ink-soft">

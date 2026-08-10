@@ -8,6 +8,7 @@ import ContractSignForm from "@/components/ContractSignForm";
 import ContractPaymentForm from "@/components/ContractPaymentForm";
 import ContractPdfButton from "@/components/ContractPdfButton";
 import CopyLinkButton from "@/components/CopyLinkButton";
+import BurstBallIcon from "@/components/BurstBallIcon";
 
 export const metadata: Metadata = { title: "Reklama shartnomasi" };
 
@@ -24,7 +25,8 @@ export default async function ContractSignPage({
 
   if (!contract) {
     return (
-      <div className="mx-auto max-w-md px-4 py-20 text-center sm:px-6">
+      <div className="mx-auto flex max-w-md flex-col items-center px-4 py-20 text-center sm:px-6">
+        <BurstBallIcon className="wobble mb-6 h-28 w-28" />
         <h1 className="mb-2 font-heading text-2xl font-bold text-ink">Shartnoma topilmadi</h1>
         <p className="text-ink-soft">
           Bunday shartnoma mavjud emas — havola noto&apos;g&apos;ri bo&apos;lishi yoki shartnoma o&apos;chirilgan

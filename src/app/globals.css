@@ -137,3 +137,18 @@ h4,
 .toast-in {
   animation: toast-in 0.25s ease;
 }
+
+/* A deflated ball can't bounce — it just teeters. Used on "not found" states. */
+@keyframes wobble {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+.wobble {
+  animation: wobble 2.2s ease-in-out infinite;
+  transform-origin: 50% 85%;
+}
