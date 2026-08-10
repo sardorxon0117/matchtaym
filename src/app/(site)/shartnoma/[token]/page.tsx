@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { getAdContractByToken, getAdContractSettings } from "@/lib/queries";
 import { getBookedRanges } from "@/lib/contract";
 import { formatUzs } from "@/lib/contract-format";
@@ -22,7 +21,18 @@ export default async function ContractSignPage({
   const { token } = await params;
   const { xato } = await searchParams;
   const contract = await getAdContractByToken(token);
-  if (!contract) notFound();
+
+  if (!contract) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-20 text-center sm:px-6">
+        <h1 className="mb-2 font-heading text-2xl font-bold text-ink">Shartnoma topilmadi</h1>
+        <p className="text-ink-soft">
+          Bunday shartnoma mavjud emas — havola noto&apos;g&apos;ri bo&apos;lishi yoki shartnoma o&apos;chirilgan
+          bo&apos;lishi mumkin.
+        </p>
+      </div>
+    );
+  }
 
   const needsBookedRanges = contract.status === "PENDING_SIGNATURE";
   const needsSettings = contract.status === "AWAITING_PAYMENT" || contract.status === "REJECTED";
