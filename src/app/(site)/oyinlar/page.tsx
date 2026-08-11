@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTop5Fixtures } from "@/lib/football";
 import MatchTile from "@/components/MatchTile";
+import MatchRow from "@/components/MatchRow";
 
 export const metadata: Metadata = { title: "O'yinlar" };
 export const revalidate = 1800;
@@ -18,7 +19,17 @@ export default async function MatchesPage() {
       {matches.length > 0 ? (
         <div className="flex flex-col gap-4">
           {matches.map((m) => (
-            <MatchTile key={m.id} match={m} />
+            <div key={m.id}>
+              {/* MatchTile's horizontal layout (date | team | score | team) gets too
+                  cramped on narrow phones — team names/logos were getting squeezed
+                  out. Below sm, use the same stacked layout as the promo box instead. */}
+              <div className="rounded-card border border-ink/10 bg-white px-4 sm:hidden">
+                <MatchRow match={m} />
+              </div>
+              <div className="hidden sm:block">
+                <MatchTile match={m} />
+              </div>
+            </div>
           ))}
         </div>
       ) : (
