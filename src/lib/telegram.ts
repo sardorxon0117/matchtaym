@@ -45,6 +45,13 @@ export async function notifyNewComment(params: {
   );
 }
 
+export async function notifyNewLiveComment(params: { authorName: string; content: string; isReply: boolean }) {
+  const kind = params.isReply ? "Live javob" : "Yangi live izoh";
+  await sendTelegramMessage(
+    `🔴 <b>${kind}</b>\n<b>${escapeHtml(params.authorName)}</b>: ${escapeHtml(params.content)}`
+  );
+}
+
 export async function notifyNewDonationInquiry(params: { name: string; email: string; message: string | null }) {
   await sendTelegramMessage(
     `💚 <b>Yangi yordam so'rovi (Donate)</b>\n` +

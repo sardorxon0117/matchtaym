@@ -1,0 +1,62 @@
+"use client";
+
+import { useActionState, useEffect, useRef } from "react";
+import { createLiveComment } from "@/actions/live";
+import { useToast } from "@/components/Toast";
+
+export default function LiveCommentForm({
+  parentId = null,
+  placeholder = "Fikringizni yozing…",
+  submitLabel = "Yuborish",
+  autoFocus = false,
+  onDone,
+}: {
+  parentId?: string | null;
+  placeholder?: string;
+  submitLabel?: string;
+  autoFocus?: boolean;
+  onDone?: () => void;
+}) {
+  const action = createLiveComment.bind(null, parentId);
+  const [error, formAction, pending] = useActionState(action, undefined);
+  const formRef = useRef<HTMLFormElement>(null);
+  const wasPending = useRef(false);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (wasPending.current && !pending) {
+      if (error) {
+        toast.show(error, "error");
+      } else {
+        formRef.current?.reset();
+        toast.show(parentId ? "Javob yuborildi ✓" : "Izoh yuborildi ✓");
+        onDone?.();
+      }
+    }
+    wasPending.current = pending;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pending, error]);
+
+  return (
+    <form ref={formRef} action={formAction} className="space-y-2">
+      <textarea
+        name="content"
+        required
+        minLength={2}
+        maxLength={2000}
+        rows={parentId ? 2 : 3}
+        placeholder={placeholder}
+        autoFocus={autoFocus}
+        className="input resize-none"
+      />
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      <button
+        type="submit"
+        disabled={pending}
+        className="rounded-pill bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-dark disabled:opacity-60"
+      >
+        {pending ? "Yuborilmoqda…" : submitLabel}
+      </button>
+    </form>
+  );
+}

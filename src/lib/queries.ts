@@ -297,3 +297,67 @@ export async function getAllCommentsForAdmin(filter: "all" | "answered" | "pendi
   if (filter === "pending") return topLevel.filter((c) => c.replies.length === 0);
   return topLevel;
 }
+
+// --- Live ---
+
+export async function getLiveSettings() {
+  return prisma.liveSettings.findUnique({ where: { id: "singleton" } });
+}
+
+/** Upcoming broadcasts only, soonest first — for the public /live page. */
+export async function getUpcomingLiveSchedule() {
+  return prisma.liveSchedule.findMany({
+    where: { startAt: { gte: new Date() } },
+    orderBy: { startAt: "asc" },
+  });
+}
+
+export async function getAllLiveScheduleForAdmin() {
+  return prisma.liveSchedule.findMany({ orderBy: { startAt: "desc" } });
+}
+
+/** Builds an arbitrary-depth reply tree, same approach as getCommentsForArticle. */
+export async function getLiveComments() {
+  const comments = await prisma.liveComment.findMany({
+    orderBy: { createdAt: "asc" },
+    include: {
+      author: { select: { id: true, name: true, image: true, role: true } },
+    },
+  });
+
+  type LiveCommentWithAuthor = (typeof comments)[number];
+  type LiveCommentNode = LiveCommentWithAuthor & { replies: LiveCommentNode[] };
+
+  const byId = new Map<string, LiveCommentNode>();
+  for (const c of comments) byId.set(c.id, { ...c, replies: [] });
+
+  const roots: LiveCommentNode[] = [];
+  for (const c of comments) {
+    const node = byId.get(c.id)!;
+    if (c.parentId && byId.has(c.parentId)) {
+      byId.get(c.parentId)!.replies.push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+  return roots.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+export async function getAllLiveCommentsForAdmin(filter: "all" | "answered" | "pending" = "all") {
+  const topLevel = await prisma.liveComment.findMany({
+    where: { parentId: null },
+    orderBy: { createdAt: "desc" },
+    take: 300,
+    include: {
+      author: { select: { name: true, role: true } },
+      replies: {
+        orderBy: { createdAt: "asc" },
+        include: { author: { select: { name: true, role: true } } },
+      },
+    },
+  });
+
+  if (filter === "answered") return topLevel.filter((c) => c.replies.length > 0);
+  if (filter === "pending") return topLevel.filter((c) => c.replies.length === 0);
+  return topLevel;
+}

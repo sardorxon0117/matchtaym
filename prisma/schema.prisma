@@ -50,10 +50,11 @@ model User {
   role          Role      @default(READER)
   createdAt     DateTime  @default(now())
 
-  articles Article[]
-  accounts Account[]
-  sessions Session[]
-  comments Comment[]
+  articles     Article[]
+  accounts     Account[]
+  sessions     Session[]
+  comments     Comment[]
+  liveComments LiveComment[]
 
   @@map("users")
 }
@@ -288,4 +289,49 @@ model AdContractSettings {
   updatedAt      DateTime @updatedAt
 
   @@map("ad_contract_settings")
+}
+
+// Singleton row — controls the /live page. isLive is a manual switch (not
+// auto-detected from Twitch) so the admin decides exactly when the big
+// player shows up, independent of whatever OBS/Twitch itself reports.
+model LiveSettings {
+  id            String   @id @default("singleton")
+  isLive        Boolean  @default(false)
+  twitchChannel String?
+  updatedAt     DateTime @updatedAt
+
+  @@map("live_settings")
+}
+
+// The admin's own curated "what we're streaming next" list — distinct from
+// the general fixtures feed, since it's specifically about what MatchTaym
+// itself plans to broadcast.
+model LiveSchedule {
+  id        String   @id @default(cuid())
+  title     String
+  startAt   DateTime
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([startAt])
+  @@map("live_schedule")
+}
+
+// A separate comment feed for the /live page (not tied to any article) —
+// same shape/behavior as Comment (threaded replies, staff replies branded
+// as "MatchTaym jamoasi" at the display layer).
+model LiveComment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+
+  parent   LiveComment?  @relation("LiveCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId String?
+  replies  LiveComment[] @relation("LiveCommentReplies")
+
+  @@index([createdAt])
+  @@map("live_comments")
 }

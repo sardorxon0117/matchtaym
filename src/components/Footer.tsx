@@ -31,6 +31,11 @@ export default function Footer() {
               </li>
             ))}
             <li>
+              <Link href="/live" className="text-cream/80 hover:text-accent">
+                Live
+              </Link>
+            </li>
+            <li>
               <Link href="/donate" className="text-cream/80 hover:text-accent">
                 Donate
               </Link>
