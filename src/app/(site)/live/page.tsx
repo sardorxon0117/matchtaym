@@ -5,6 +5,7 @@ import TwitchPlayer from "@/components/TwitchPlayer";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import LiveCommentSection from "@/components/LiveCommentSection";
 import LiveAdBanner from "@/components/LiveAdBanner";
+import LiveStatusWatcher from "@/components/LiveStatusWatcher";
 
 export const metadata: Metadata = { title: "Live" };
 export const revalidate = 30;
@@ -21,6 +22,7 @@ export default async function LivePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+      <LiveStatusWatcher initialLive={isLive} />
       <h1 className="mb-6 font-heading text-2xl font-bold text-ink sm:text-3xl">Live</h1>
 
       {isLive ? (

@@ -11,7 +11,9 @@ const ROTATE_MS = 5 * 60 * 1000;
  * Fills the "video slot" while nothing's live — always the desktop/tablet
  * creative (desktopImageUrl) at a fixed 3:2 ratio on every screen size,
  * unlike the sidebar promo box which switches to a separate mobile creative
- * and ratio on small screens.
+ * and ratio on small screens. Uses object-cover (not -contain) so the
+ * creative always fills the box edge-to-edge, even if its own aspect ratio
+ * isn't an exact 3:2 — no visible letterboxing strip.
  */
 export default function LiveAdBanner({ banners }: { banners: Banner[] }) {
   const index = useRotatingIndex(banners.length, ROTATE_MS);
@@ -30,14 +32,14 @@ export default function LiveAdBanner({ banners }: { banners: Banner[] }) {
       {isVideoUrl(activeBanner.desktopImageUrl) ? (
         <video
           src={activeBanner.desktopImageUrl}
-          className="h-full w-full object-contain"
+          className="h-full w-full object-cover"
           autoPlay
           loop
           muted
           playsInline
         />
       ) : (
-        <Image src={activeBanner.desktopImageUrl} alt="Reklama" fill className="object-contain" sizes="(max-width: 768px) 100vw, 700px" />
+        <Image src={activeBanner.desktopImageUrl} alt="Reklama" fill className="object-cover" sizes="(max-width: 768px) 100vw, 700px" />
       )}
       <span className="absolute bottom-2 right-2 rounded bg-ink/60 px-1.5 py-0.5 text-[10px] text-white">Reklama</span>
     </a>
