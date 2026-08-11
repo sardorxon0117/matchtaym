@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { getLiveSettings, getUpcomingLiveSchedule, getAdContractSettings, getActiveBanners } from "@/lib/queries";
 import { formatDateTimeUz } from "@/lib/utils";
-import TwitchPlayer from "@/components/TwitchPlayer";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import LiveCommentSection from "@/components/LiveCommentSection";
-import LiveAdBanner from "@/components/LiveAdBanner";
-import LiveStatusWatcher from "@/components/LiveStatusWatcher";
+import LiveStage from "@/components/LiveStage";
 
 export const metadata: Metadata = { title: "Live" };
 export const revalidate = 30;
@@ -19,39 +17,21 @@ export default async function LivePage() {
   ]);
 
   const isLive = !!settings?.isLive && !!settings.twitchChannel;
+  const offlineNote =
+    schedule.length > 0
+      ? `Keyingi efir: ${schedule[0].title} — ${formatDateTimeUz(schedule[0].startAt)}`
+      : "Tez orada yangi efir haqida xabar beramiz.";
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-      <LiveStatusWatcher initialLive={isLive} />
       <h1 className="mb-6 font-heading text-2xl font-bold text-ink sm:text-3xl">Live</h1>
 
-      {isLive ? (
-        <div className="mb-8">
-          <div className="mb-3 flex items-center gap-2">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-600" />
-            </span>
-            <span className="text-sm font-semibold text-red-600">Jonli efirdamiz</span>
-          </div>
-          <TwitchPlayer channel={settings!.twitchChannel!} />
-        </div>
-      ) : (
-        <>
-          <div className="mb-4 flex items-center gap-3 rounded-card border border-ink/10 bg-white px-5 py-4">
-            <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-ink/20" />
-            <div>
-              <p className="font-heading text-sm font-semibold text-ink">Hozircha jonli efir yo&apos;q</p>
-              <p className="text-sm text-ink-soft">
-                {schedule.length > 0
-                  ? `Keyingi efir: ${schedule[0].title} — ${formatDateTimeUz(schedule[0].startAt)}`
-                  : "Tez orada yangi efir haqida xabar beramiz."}
-              </p>
-            </div>
-          </div>
-          <LiveAdBanner banners={banners} />
-        </>
-      )}
+      <LiveStage
+        initialLive={isLive}
+        twitchChannel={settings?.twitchChannel ?? null}
+        banners={banners}
+        offlineNote={offlineNote}
+      />
 
       {schedule.length > 0 && (
         <section className="mb-8 rounded-card border border-ink/10 bg-white p-5 sm:p-6">
