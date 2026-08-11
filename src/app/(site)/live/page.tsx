@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
-import { getLiveSettings, getUpcomingLiveSchedule, getAdContractSettings } from "@/lib/queries";
+import { getLiveSettings, getUpcomingLiveSchedule, getAdContractSettings, getActiveBanners } from "@/lib/queries";
 import { formatDateTimeUz } from "@/lib/utils";
 import TwitchPlayer from "@/components/TwitchPlayer";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import LiveCommentSection from "@/components/LiveCommentSection";
+import LiveAdBanner from "@/components/LiveAdBanner";
 
 export const metadata: Metadata = { title: "Live" };
 export const revalidate = 30;
 
 export default async function LivePage() {
-  const [settings, schedule, cardSettings] = await Promise.all([
+  const [settings, schedule, cardSettings, banners] = await Promise.all([
     getLiveSettings(),
     getUpcomingLiveSchedule(),
     getAdContractSettings(),
+    getActiveBanners(),
   ]);
 
   const isLive = !!settings?.isLive && !!settings.twitchChannel;
@@ -33,17 +35,20 @@ export default async function LivePage() {
           <TwitchPlayer channel={settings!.twitchChannel!} />
         </div>
       ) : (
-        <div className="mb-8 flex items-center gap-3 rounded-card border border-ink/10 bg-white px-5 py-4">
-          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-ink/20" />
-          <div>
-            <p className="font-heading text-sm font-semibold text-ink">Hozircha jonli efir yo&apos;q</p>
-            <p className="text-sm text-ink-soft">
-              {schedule.length > 0
-                ? `Keyingi efir: ${schedule[0].title} — ${formatDateTimeUz(schedule[0].startAt)}`
-                : "Tez orada yangi efir haqida xabar beramiz."}
-            </p>
+        <>
+          <div className="mb-4 flex items-center gap-3 rounded-card border border-ink/10 bg-white px-5 py-4">
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-ink/20" />
+            <div>
+              <p className="font-heading text-sm font-semibold text-ink">Hozircha jonli efir yo&apos;q</p>
+              <p className="text-sm text-ink-soft">
+                {schedule.length > 0
+                  ? `Keyingi efir: ${schedule[0].title} — ${formatDateTimeUz(schedule[0].startAt)}`
+                  : "Tez orada yangi efir haqida xabar beramiz."}
+              </p>
+            </div>
           </div>
-        </div>
+          <LiveAdBanner banners={banners} />
+        </>
       )}
 
       {schedule.length > 0 && (
