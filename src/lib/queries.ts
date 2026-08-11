@@ -316,9 +316,24 @@ export async function getAllLiveScheduleForAdmin() {
   return prisma.liveSchedule.findMany({ orderBy: { startAt: "desc" } });
 }
 
+/** The session comments currently attach to (whatever the admin most recently started). */
+export async function getCurrentLiveSession() {
+  const settings = await prisma.liveSettings.findUnique({ where: { id: "singleton" } });
+  if (!settings?.currentSessionId) return null;
+  return prisma.liveSession.findUnique({ where: { id: settings.currentSessionId } });
+}
+
+export async function getAllLiveSessions() {
+  return prisma.liveSession.findMany({
+    orderBy: { startedAt: "desc" },
+    include: { _count: { select: { comments: true } } },
+  });
+}
+
 /** Builds an arbitrary-depth reply tree, same approach as getCommentsForArticle. */
-export async function getLiveComments() {
+export async function getLiveComments(sessionId: string) {
   const comments = await prisma.liveComment.findMany({
+    where: { sessionId },
     orderBy: { createdAt: "asc" },
     include: {
       author: { select: { id: true, name: true, image: true, role: true } },
@@ -343,9 +358,9 @@ export async function getLiveComments() {
   return roots.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
 
-export async function getAllLiveCommentsForAdmin(filter: "all" | "answered" | "pending" = "all") {
+export async function getAllLiveCommentsForAdmin(sessionId: string, filter: "all" | "answered" | "pending" = "all") {
   const topLevel = await prisma.liveComment.findMany({
-    where: { parentId: null },
+    where: { parentId: null, sessionId },
     orderBy: { createdAt: "desc" },
     take: 300,
     include: {

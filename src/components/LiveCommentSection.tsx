@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/auth";
-import { getLiveComments } from "@/lib/queries";
+import { getLiveComments, getCurrentLiveSession } from "@/lib/queries";
+import { formatDateTimeUz } from "@/lib/utils";
 import LiveCommentForm from "./LiveCommentForm";
 import LiveCommentItem from "./LiveCommentItem";
 
@@ -9,7 +10,18 @@ function countAll(nodes: { replies: unknown[] }[]): number {
 }
 
 export default async function LiveCommentSection() {
-  const [session, comments] = await Promise.all([auth(), getLiveComments()]);
+  const currentSession = await getCurrentLiveSession();
+
+  if (!currentSession) {
+    return (
+      <section className="mt-10 border-t border-ink/10 pt-8">
+        <h2 className="mb-5 font-heading text-xl font-bold text-ink">Izohlar</h2>
+        <p className="text-sm text-ink-soft">Hali birorta efir bo&apos;lib o&apos;tmagan — birinchisi boshlanganda shu yerda izoh qoldirishingiz mumkin bo&apos;ladi.</p>
+      </section>
+    );
+  }
+
+  const [session, comments] = await Promise.all([auth(), getLiveComments(currentSession.id)]);
 
   const currentUser = session?.user
     ? { id: session.user.id, role: (session.user as { role?: string }).role ?? "" }
@@ -19,7 +31,10 @@ export default async function LiveCommentSection() {
 
   return (
     <section className="mt-10 border-t border-ink/10 pt-8">
-      <h2 className="mb-5 font-heading text-xl font-bold text-ink">Izohlar ({total})</h2>
+      <h2 className="mb-1 font-heading text-xl font-bold text-ink">Izohlar ({total})</h2>
+      <p className="mb-5 text-xs text-ink-soft/70">
+        {currentSession.endedAt ? "So'nggi efir" : "Hozirgi efir"} — {formatDateTimeUz(currentSession.startedAt)}
+      </p>
 
       {currentUser ? (
         <div className="mb-8 max-w-xl">

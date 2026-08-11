@@ -33,13 +33,16 @@ export default async function LivePage() {
           <TwitchPlayer channel={settings!.twitchChannel!} />
         </div>
       ) : (
-        <div className="mb-8 flex aspect-video w-full flex-col items-center justify-center rounded-card border border-ink/10 bg-white text-center">
-          <p className="mb-1 font-heading text-lg font-semibold text-ink">Hozircha jonli efir yo&apos;q</p>
-          <p className="text-sm text-ink-soft">
-            {schedule.length > 0
-              ? `Keyingi efir: ${schedule[0].title} — ${formatDateTimeUz(schedule[0].startAt)}`
-              : "Tez orada yangi efir haqida xabar beramiz."}
-          </p>
+        <div className="mb-8 flex items-center gap-3 rounded-card border border-ink/10 bg-white px-5 py-4">
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-ink/20" />
+          <div>
+            <p className="font-heading text-sm font-semibold text-ink">Hozircha jonli efir yo&apos;q</p>
+            <p className="text-sm text-ink-soft">
+              {schedule.length > 0
+                ? `Keyingi efir: ${schedule[0].title} — ${formatDateTimeUz(schedule[0].startAt)}`
+                : "Tez orada yangi efir haqida xabar beramiz."}
+            </p>
+          </div>
         </div>
       )}
 

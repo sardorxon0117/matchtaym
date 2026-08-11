@@ -10,6 +10,24 @@ import { notifyNewLiveComment } from "@/lib/telegram";
 
 const STAFF_ROLES = new Set(["ADMIN", "EDITOR"]);
 
+/**
+ * The session comments currently attach to — whatever the admin most
+ * recently started (live or just-ended). Lazily creates one if nobody has
+ * ever gone live yet, so commenting never hard-blocks on that.
+ */
+async function getOrCreateCurrentSessionId(): Promise<string> {
+  const settings = await prisma.liveSettings.findUnique({ where: { id: "singleton" } });
+  if (settings?.currentSessionId) return settings.currentSessionId;
+
+  const newSession = await prisma.liveSession.create({ data: {} });
+  await prisma.liveSettings.upsert({
+    where: { id: "singleton" },
+    create: { id: "singleton", currentSessionId: newSession.id },
+    update: { currentSessionId: newSession.id },
+  });
+  return newSession.id;
+}
+
 // --- Public: live comments ---
 
 export async function createLiveComment(parentId: string | null, _prevState: string | undefined, formData: FormData) {
@@ -20,8 +38,10 @@ export async function createLiveComment(parentId: string | null, _prevState: str
   if (content.length < 2) return "Izoh juda qisqa";
   if (content.length > 2000) return "Izoh juda uzun";
 
+  const sessionId = await getOrCreateCurrentSessionId();
+
   await prisma.liveComment.create({
-    data: { content, parentId, authorId: session.user.id },
+    data: { content, parentId, authorId: session.user.id, sessionId },
   });
 
   await notifyNewLiveComment({
@@ -54,11 +74,30 @@ export async function deleteLiveComment(id: string) {
 
 export async function toggleLiveStatus(next: boolean) {
   await requireAdmin();
-  await prisma.liveSettings.upsert({
-    where: { id: "singleton" },
-    create: { id: "singleton", isLive: next },
-    update: { isLive: next },
-  });
+
+  if (next) {
+    // Going live: always start a fresh session, so this broadcast's
+    // comments don't mix with the last one's.
+    const newSession = await prisma.liveSession.create({ data: {} });
+    await prisma.liveSettings.upsert({
+      where: { id: "singleton" },
+      create: { id: "singleton", isLive: true, currentSessionId: newSession.id },
+      update: { isLive: true, currentSessionId: newSession.id },
+    });
+  } else {
+    const settings = await prisma.liveSettings.upsert({
+      where: { id: "singleton" },
+      create: { id: "singleton", isLive: false },
+      update: { isLive: false },
+    });
+    if (settings.currentSessionId) {
+      await prisma.liveSession.update({
+        where: { id: settings.currentSessionId },
+        data: { endedAt: new Date() },
+      });
+    }
+  }
+
   revalidatePath("/live");
   revalidatePath("/admin/live");
 }
