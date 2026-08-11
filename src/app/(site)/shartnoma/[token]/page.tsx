@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getAdContractByToken, getAdContractSettings } from "@/lib/queries";
 import { getBookedRanges } from "@/lib/contract";
 import { formatUzs } from "@/lib/contract-format";
@@ -8,7 +9,6 @@ import ContractSignForm from "@/components/ContractSignForm";
 import ContractPaymentForm from "@/components/ContractPaymentForm";
 import ContractPdfButton from "@/components/ContractPdfButton";
 import CopyLinkButton from "@/components/CopyLinkButton";
-import BurstBallIcon from "@/components/BurstBallIcon";
 
 export const metadata: Metadata = { title: "Reklama shartnomasi" };
 
@@ -23,18 +23,7 @@ export default async function ContractSignPage({
   const { xato } = await searchParams;
   const contract = await getAdContractByToken(token);
 
-  if (!contract) {
-    return (
-      <div className="mx-auto flex max-w-md flex-col items-center px-4 py-20 text-center sm:px-6">
-        <BurstBallIcon className="wobble mb-6 h-28 w-28" />
-        <h1 className="mb-2 font-heading text-2xl font-bold text-ink">Shartnoma topilmadi</h1>
-        <p className="text-ink-soft">
-          Bunday shartnoma mavjud emas — havola noto&apos;g&apos;ri bo&apos;lishi yoki shartnoma o&apos;chirilgan
-          bo&apos;lishi mumkin.
-        </p>
-      </div>
-    );
-  }
+  if (!contract) notFound();
 
   const needsBookedRanges = contract.status === "PENDING_SIGNATURE";
   const needsSettings = contract.status === "AWAITING_PAYMENT" || contract.status === "REJECTED";
