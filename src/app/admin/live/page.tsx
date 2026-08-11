@@ -5,7 +5,7 @@ import {
   getAllLiveCommentsForAdmin,
   getAllLiveSessions,
 } from "@/lib/queries";
-import { deleteLiveScheduleEntry } from "@/actions/live";
+import { deleteLiveScheduleEntry, deleteLiveComment } from "@/actions/live";
 import { formatDateTimeUz } from "@/lib/utils";
 import DeleteButton from "@/components/admin/DeleteButton";
 import LiveToggle from "@/components/admin/LiveToggle";
@@ -151,15 +151,27 @@ async function CommentsTab({ sessionId }: { sessionId?: string }) {
                 <span className="text-ink-soft/60">•</span>
                 <span className="text-ink-soft/60">{formatDateTimeUz(c.createdAt)}</span>
               </div>
+              <DeleteButton
+                action={deleteLiveComment.bind(null, c.id)}
+                className="text-xs font-medium text-red-600 hover:underline"
+                successMessage="Izoh o'chirildi"
+              />
             </div>
             <p className="whitespace-pre-wrap text-sm text-ink-soft">{c.content}</p>
 
             {c.replies.length > 0 && (
               <div className="mt-3 space-y-2 border-l-2 border-primary/20 pl-3">
                 {c.replies.map((r) => (
-                  <p key={r.id} className="text-sm text-ink-soft">
-                    <span className="font-semibold text-ink">{r.author.name}:</span> {r.content}
-                  </p>
+                  <div key={r.id} className="flex items-start justify-between gap-2">
+                    <p className="text-sm text-ink-soft">
+                      <span className="font-semibold text-ink">{r.author.name}:</span> {r.content}
+                    </p>
+                    <DeleteButton
+                      action={deleteLiveComment.bind(null, r.id)}
+                      className="shrink-0 text-xs font-medium text-red-600 hover:underline"
+                      successMessage="Javob o'chirildi"
+                    />
+                  </div>
                 ))}
               </div>
             )}
