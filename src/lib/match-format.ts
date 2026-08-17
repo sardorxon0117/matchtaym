@@ -81,9 +81,18 @@ function isSameTashkentDay(aSec: number, bSec: number): boolean {
   return a.year === b.year && a.month === b.month && a.day === b.day;
 }
 
-export function formatKickoffDate(timestampSec: number): string {
-  const { day, month } = tashkentParts(timestampSec);
-  return `${day}-${MONTHS_SHORT[month - 1] ?? month}`;
+/** "Bugun" / "Kecha" / "Ertaga" for matches near today (Tashkent time), otherwise "17-avg". */
+export function formatKickoffDate(timestampSec: number, nowSec: number = Date.now() / 1000): string {
+  const match = tashkentParts(timestampSec);
+  const now = tashkentParts(nowSec);
+  const matchDay = Date.UTC(match.year, match.month - 1, match.day);
+  const today = Date.UTC(now.year, now.month - 1, now.day);
+  const diffDays = Math.round((matchDay - today) / 86_400_000);
+
+  if (diffDays === 0) return "Bugun";
+  if (diffDays === -1) return "Kecha";
+  if (diffDays === 1) return "Ertaga";
+  return `${match.day}-${MONTHS_SHORT[match.month - 1] ?? match.month}`;
 }
 
 export function formatKickoffTime(timestampSec: number): string {
