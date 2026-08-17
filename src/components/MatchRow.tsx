@@ -4,6 +4,13 @@ import { formatKickoffDate, formatKickoffTime, getMatchPhase, statusLabel } from
 export default function MatchRow({ match }: { match: Fixture }) {
   const phase = getMatchPhase(match);
   const started = phase !== "upcoming";
+  // Highlight the winning side once the match is over — draws stay neutral.
+  const winner =
+    phase === "finished" && match.goalsHome !== match.goalsAway
+      ? match.goalsHome! > match.goalsAway!
+        ? "home"
+        : "away"
+      : null;
 
   return (
     <div className="py-3.5">
@@ -23,17 +30,21 @@ export default function MatchRow({ match }: { match: Fixture }) {
         <div className="flex min-w-0 items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element -- small external team badges, not worth an image-optimization proxy */}
           <img src={match.homeLogo} alt="" className="h-6 w-6 shrink-0 rounded-full bg-ink/5 object-contain" />
-          <span className="truncate font-medium">{match.homeName}</span>
+          <span className={`truncate font-medium ${winner === "home" ? "text-primary" : ""}`}>{match.homeName}</span>
         </div>
-        {started && <span className="shrink-0 font-bold">{match.goalsHome}</span>}
+        {started && (
+          <span className={`shrink-0 font-bold ${winner === "home" ? "text-primary" : ""}`}>{match.goalsHome}</span>
+        )}
       </div>
       <div className="mt-1.5 flex items-center justify-between gap-2 text-sm text-ink">
         <div className="flex min-w-0 items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={match.awayLogo} alt="" className="h-6 w-6 shrink-0 rounded-full bg-ink/5 object-contain" />
-          <span className="truncate font-medium">{match.awayName}</span>
+          <span className={`truncate font-medium ${winner === "away" ? "text-primary" : ""}`}>{match.awayName}</span>
         </div>
-        {started && <span className="shrink-0 font-bold">{match.goalsAway}</span>}
+        {started && (
+          <span className={`shrink-0 font-bold ${winner === "away" ? "text-primary" : ""}`}>{match.goalsAway}</span>
+        )}
       </div>
     </div>
   );

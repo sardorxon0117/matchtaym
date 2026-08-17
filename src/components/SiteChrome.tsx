@@ -36,20 +36,28 @@ export default async function SiteChrome({ children }: { children: React.ReactNo
     <>
       <div className="print:hidden">
         <Header user={user} />
-        <MobileAdBanner banners={banners} />
       </div>
 
-      <div className="mx-auto flex w-full max-w-[90rem] items-start gap-6 px-0 md:px-6">
-        <div className="min-w-0 flex-1">{children}</div>
-        <aside className="sticky top-20 hidden w-[340px] shrink-0 py-8 md:block print:hidden">
-          <Suspense fallback={<PromoBoxSkeleton />}>
-            <PromoBoxServer banners={banners} />
-          </Suspense>
-        </aside>
-      </div>
+      {/* Header is fixed (position: fixed), so it's out of document flow —
+          this spacer reserves its height (h-16, see Header.tsx) so nothing
+          renders underneath it. */}
+      <div className="pt-16">
+        <div className="print:hidden">
+          <MobileAdBanner banners={banners} />
+        </div>
 
-      <div className="print:hidden">
-        <Footer />
+        <div className="mx-auto flex w-full max-w-[90rem] items-start gap-6 px-0 md:px-6">
+          <div className="min-w-0 flex-1">{children}</div>
+          <aside className="sticky top-20 hidden w-[340px] shrink-0 py-8 md:block print:hidden">
+            <Suspense fallback={<PromoBoxSkeleton />}>
+              <PromoBoxServer banners={banners} />
+            </Suspense>
+          </aside>
+        </div>
+
+        <div className="print:hidden">
+          <Footer />
+        </div>
       </div>
     </>
   );

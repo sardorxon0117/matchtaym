@@ -57,6 +57,7 @@ function tashkentParts(timestampSec: number) {
   const d = new Date(timestampSec * 1000);
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: "Asia/Tashkent",
+    year: "numeric",
     day: "2-digit",
     month: "2-digit",
     hour: "2-digit",
@@ -64,7 +65,20 @@ function tashkentParts(timestampSec: number) {
     hourCycle: "h23",
   }).formatToParts(d);
   const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
-  return { day: Number(get("day")), month: Number(get("month")), hour: get("hour"), minute: get("minute") };
+  return {
+    year: Number(get("year")),
+    day: Number(get("day")),
+    month: Number(get("month")),
+    hour: get("hour"),
+    minute: get("minute"),
+  };
+}
+
+/** Whether two kickoff timestamps fall on the same calendar day in Tashkent time. */
+function isSameTashkentDay(aSec: number, bSec: number): boolean {
+  const a = tashkentParts(aSec);
+  const b = tashkentParts(bSec);
+  return a.year === b.year && a.month === b.month && a.day === b.day;
 }
 
 export function formatKickoffDate(timestampSec: number): string {
@@ -97,6 +111,38 @@ export function pickOnePerLeague(fixtures: Fixture[], leagueIds: number[]): Fixt
     const candidates = fixtures.filter((f) => f.leagueId === id);
     if (candidates.length === 0) continue;
     picks.push(candidates.reduce((a, b) => (a.timestamp <= b.timestamp ? a : b)));
+  }
+  return picks.sort((a, b) => a.timestamp - b.timestamp);
+}
+
+/**
+ * Picks one fixture per given league for the promo box: today's match for
+ * that league if there is one (live/finished/upcoming — whatever's on today,
+ * Tashkent time), otherwise the next upcoming match in that league. This
+ * keeps a match that already finished yesterday from lingering in the promo
+ * box once today has no game of its own — it hands off to tomorrow's (or
+ * whichever is next) fixture instead. Leagues with neither are skipped.
+ */
+export function pickTodayOrNextPerLeague(
+  fixtures: Fixture[],
+  leagueIds: number[],
+  nowSec: number = Date.now() / 1000
+): Fixture[] {
+  const picks: Fixture[] = [];
+  for (const id of leagueIds) {
+    const candidates = fixtures.filter((f) => f.leagueId === id);
+    if (candidates.length === 0) continue;
+
+    const today = candidates.filter((f) => isSameTashkentDay(f.timestamp, nowSec));
+    if (today.length > 0) {
+      picks.push(today.reduce((a, b) => (a.timestamp <= b.timestamp ? a : b)));
+      continue;
+    }
+
+    const upcoming = candidates.filter((f) => f.timestamp > nowSec);
+    if (upcoming.length > 0) {
+      picks.push(upcoming.reduce((a, b) => (a.timestamp <= b.timestamp ? a : b)));
+    }
   }
   return picks.sort((a, b) => a.timestamp - b.timestamp);
 }

@@ -4,6 +4,13 @@ import { formatKickoffDate, formatKickoffTime, getMatchPhase, statusLabel } from
 export default function MatchTile({ match }: { match: Fixture }) {
   const phase = getMatchPhase(match);
   const started = phase !== "upcoming";
+  // Highlight the winning side once the match is over — draws stay neutral.
+  const winner =
+    phase === "finished" && match.goalsHome !== match.goalsAway
+      ? match.goalsHome! > match.goalsAway!
+        ? "home"
+        : "away"
+      : null;
 
   return (
     <div className="rounded-card border border-ink/10 bg-white p-4">
@@ -22,7 +29,9 @@ export default function MatchTile({ match }: { match: Fixture }) {
         </div>
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
-          <span className="truncate text-sm font-medium text-ink">{match.homeName}</span>
+          <span className={`truncate text-sm font-medium ${winner === "home" ? "text-primary" : "text-ink"}`}>
+            {match.homeName}
+          </span>
           {/* eslint-disable-next-line @next/next/no-img-element -- small external team badge */}
           <img src={match.homeLogo} alt="" className="h-7 w-7 shrink-0 rounded-full bg-ink/5 object-contain" />
         </div>
@@ -30,8 +39,10 @@ export default function MatchTile({ match }: { match: Fixture }) {
         <div className="flex w-16 shrink-0 flex-col items-center gap-0.5">
           {started ? (
             <>
-              <span className="text-base font-bold text-ink">
-                {match.goalsHome} – {match.goalsAway}
+              <span className="text-base font-bold">
+                <span className={winner === "home" ? "text-primary" : "text-ink"}>{match.goalsHome}</span>
+                <span className="text-ink"> – </span>
+                <span className={winner === "away" ? "text-primary" : "text-ink"}>{match.goalsAway}</span>
               </span>
               <span className={`text-[10px] font-semibold ${phase === "live" ? "text-green-600" : "text-ink-soft/60"}`}>
                 {statusLabel(match)}
@@ -47,7 +58,9 @@ export default function MatchTile({ match }: { match: Fixture }) {
         <div className="flex min-w-0 flex-1 items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={match.awayLogo} alt="" className="h-7 w-7 shrink-0 rounded-full bg-ink/5 object-contain" />
-          <span className="truncate text-sm font-medium text-ink">{match.awayName}</span>
+          <span className={`truncate text-sm font-medium ${winner === "away" ? "text-primary" : "text-ink"}`}>
+            {match.awayName}
+          </span>
         </div>
       </div>
     </div>

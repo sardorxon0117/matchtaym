@@ -23,8 +23,8 @@ export default function Header({ user }: { user: HeaderUser | null }) {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-black/5 bg-cream/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+    <header className="fixed inset-x-0 top-0 z-40 border-b border-black/5 bg-cream/95 backdrop-blur">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Logo />
 
         <nav className="hidden items-center gap-6 md:flex">
